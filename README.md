@@ -28,6 +28,13 @@ Antes de começar, certifique-se de ter instalado:
 - [Docker e Docker Compose](https://docs.docker.com/get-docker/)
 - [Java 17+](https://adoptium.net/)
 
+## Configuração inicial
+Antes de rodar o projeto, crie o arquivo de configuração necessário:
+```sh
+cp src/main/resources/application.yml.example src/main/resources/application.yml
+```
+Isso criará o arquivo de configuração base para a aplicação.
+
 ## Passos para subir o projeto
 
 1. **Subir o banco de dados**
@@ -89,4 +96,3 @@ Se a migração for bem-sucedida, a tabela será criada no banco de dados automa
 
 ---
 Se tiver dúvidas, entre em contato com a equipe! 🚀
-
