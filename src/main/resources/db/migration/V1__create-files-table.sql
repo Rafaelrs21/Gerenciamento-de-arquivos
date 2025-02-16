@@ -1,0 +1,4 @@
+CREATE TABLE files (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255)
+)

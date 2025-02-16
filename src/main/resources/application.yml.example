@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: "Fileflow"
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/file_flow"
+    username: "postgres"
+    password: "admin"
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
