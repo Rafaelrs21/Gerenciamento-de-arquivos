@@ -18,6 +18,7 @@ O **Gerenciamento de Documentos** é um sistema desenvolvido para facilitar a or
 - [Lucio Caetano](https://github.com/caetanoinf)
 - [Gabriel Fonseca](https://github.com/gabrielborel)
 - [Tao Hansen](https://github.com/taohansens)
+-  [Miguel Wiest](https://github.com/miguelwiest)
 ---
 
 
