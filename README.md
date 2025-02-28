@@ -11,6 +11,10 @@ O **Gerenciamento de Documentos** é um sistema desenvolvido para facilitar a or
 
 ---
 
+## 📚 Documentação
+
+- [Relatório do Projeto](docs/projeto.md)
+
 ## 👥 Colaboradores
 - [Iasmim Silveira](https://github.com/iasmimsilveira)
 - [Rafael Santiago](https://github.com/Rafaelrs21)
@@ -18,7 +22,5 @@ O **Gerenciamento de Documentos** é um sistema desenvolvido para facilitar a or
 - [Lucio Caetano](https://github.com/caetanoinf)
 - [Gabriel Fonseca](https://github.com/gabrielborel)
 - [Tao Hansen](https://github.com/taohansens)
--  [Miguel Wiest](https://github.com/miguelwiest)
+- [Miguel Wiest](https://github.com/miguelwiest)
 ---
-
-
