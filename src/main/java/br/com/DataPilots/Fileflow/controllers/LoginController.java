@@ -3,6 +3,8 @@ package br.com.DataPilots.Fileflow.controllers;
 
 import br.com.DataPilots.Fileflow.dtos.LoginRequestDTO;
 import br.com.DataPilots.Fileflow.dtos.TokenResponseDTO;
+import br.com.DataPilots.Fileflow.entities.User;
+import br.com.DataPilots.Fileflow.services.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,20 +15,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @RequestMapping("/login")
 public class LoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping
     public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
         var token = new UsernamePasswordAuthenticationToken(request.username(), request.password());
-        this.authenticationManager.authenticate(token);
+        var authentication = this.authenticationManager.authenticate(token);
 
-        String jwtToken = "1234";
+        String jwtToken = this.tokenService.generateToken((User) authentication.getPrincipal());
         return ResponseEntity.ok(new TokenResponseDTO(jwtToken));
     }
 }
