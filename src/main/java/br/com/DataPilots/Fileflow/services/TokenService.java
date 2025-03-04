@@ -1,7 +1,10 @@
 package br.com.DataPilots.Fileflow.services;
 
+import br.com.DataPilots.Fileflow.exceptions.InvalidTokenException;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import br.com.DataPilots.Fileflow.entities.User;
@@ -9,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 @Service
 public class TokenService {
@@ -33,5 +35,17 @@ public class TokenService {
 
     private Instant getExpiresAT() {
         return LocalDateTime.now().plusHours(2).toInstant(timeConfig.zoneOffset());
+    }
+
+    public DecodedJWT decodeToken(String jwtToken) {
+        try {
+            var algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                .withIssuer(issuer)
+                .build()
+                .verify(jwtToken);
+        } catch (JWTVerificationException exception) {
+            throw new InvalidTokenException();
+        }
     }
 }
