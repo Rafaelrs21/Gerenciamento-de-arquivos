@@ -41,4 +41,8 @@ public class UsersService {
     private String encodePassword(String password) {
         return this.passwordEncoder.encode(password);
     }
+
+    public void delete(User user) {
+        this.repository.delete(user);
+    }
 }
