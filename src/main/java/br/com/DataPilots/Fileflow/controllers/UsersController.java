@@ -3,9 +3,7 @@ package br.com.DataPilots.Fileflow.controllers;
 import br.com.DataPilots.Fileflow.dtos.CreateUserRequestDTO;
 import br.com.DataPilots.Fileflow.dtos.DefaultResponseDTO;
 import br.com.DataPilots.Fileflow.entities.User;
-import br.com.DataPilots.Fileflow.exceptions.InvalidPasswordLengthException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
-import br.com.DataPilots.Fileflow.exceptions.UserAlreadyExistsException;
 import br.com.DataPilots.Fileflow.services.UsersService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
