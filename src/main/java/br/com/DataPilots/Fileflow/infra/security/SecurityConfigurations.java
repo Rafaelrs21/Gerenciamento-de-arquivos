@@ -30,6 +30,7 @@ public class SecurityConfigurations {
             })
             .authorizeHttpRequests(request -> {
                 request.requestMatchers(HttpMethod.POST, "/login").permitAll();
+                request.requestMatchers(HttpMethod.POST, "/users").permitAll();
                 request.anyRequest().authenticated();
             })
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
