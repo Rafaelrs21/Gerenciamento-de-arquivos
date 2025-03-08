@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of="id")
-public class File {
+public class Folder {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private Long folderId;
@@ -28,6 +28,7 @@ public class File {
     public Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("id", id);
+        data.put("folderId", folderId);
         data.put("name", name);
         return data;
     }
