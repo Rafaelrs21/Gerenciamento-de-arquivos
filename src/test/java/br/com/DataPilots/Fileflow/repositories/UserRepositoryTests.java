@@ -13,7 +13,7 @@ import java.util.Optional;
 @DataJpaTest
 public class UserRepositoryTests {
     @Autowired
-    private UsersRepository repository;
+    private UserRepository repository;
 
     private Long existingId = 1L;
     private Long nonExistingId = 1000L;

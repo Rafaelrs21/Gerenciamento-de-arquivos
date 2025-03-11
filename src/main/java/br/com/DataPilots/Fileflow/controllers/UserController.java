@@ -4,7 +4,7 @@ import br.com.DataPilots.Fileflow.dtos.CreateUserRequestDTO;
 import br.com.DataPilots.Fileflow.dtos.DefaultResponseDTO;
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
-import br.com.DataPilots.Fileflow.services.UsersService;
+import br.com.DataPilots.Fileflow.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/users")
-public class UsersController {
+public class UserController {
     @Autowired
-    private UsersService usersService;
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<DefaultResponseDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
         try {
-            this.usersService.create(request.username(), request.password());
+            this.userService.create(request.username(), request.password());
 
             return this.userCreatedResponse();
         } catch (InvalidUserException exception) {
@@ -43,7 +43,7 @@ public class UsersController {
 
     @DeleteMapping
     public ResponseEntity<DefaultResponseDTO> deleteUser(@AuthenticationPrincipal User user) {
-        usersService.delete(user);
+        userService.delete(user);
 
         return this.usersDeletedResponse();
     }

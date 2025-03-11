@@ -1,7 +1,7 @@
 package br.com.DataPilots.Fileflow.controllers;
 
 import br.com.DataPilots.Fileflow.entities.User;
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import br.com.DataPilots.Fileflow.tests.Factory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,16 +24,16 @@ public class LoginControllerIntegrationTests {
     private MockMvc mockMvc;
 
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     public void setup() {
-        usersRepository.deleteAll();
+        userRepository.deleteAll();
         User testUser = Factory.createUser("testuser",passwordEncoder.encode("testpassword"));
-        usersRepository.save(testUser);
+        userRepository.save(testUser);
     }
 
     @Test

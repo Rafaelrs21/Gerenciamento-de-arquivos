@@ -5,15 +5,15 @@ import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.exceptions.InvalidPasswordLengthException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
 import br.com.DataPilots.Fileflow.exceptions.UserAlreadyExistsException;
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UsersService {
+public class UserService {
     @Autowired
-    private UsersRepository repository;
+    private UserRepository repository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
