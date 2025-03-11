@@ -3,7 +3,6 @@ package br.com.DataPilots.Fileflow.entities;
 import java.util.Collection;
 import java.util.List;
 
-import br.com.DataPilots.Fileflow.dtos.CreateUserRequestDTO;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
