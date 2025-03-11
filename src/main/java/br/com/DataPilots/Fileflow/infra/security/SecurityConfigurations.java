@@ -1,14 +1,16 @@
 package br.com.DataPilots.Fileflow.infra.security;
 
 import br.com.DataPilots.Fileflow.infra.SecurityFilter;
-import br.com.DataPilots.Fileflow.services.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -20,21 +22,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfigurations {
     @Autowired
     private SecurityFilter securityFilter;
+    @Autowired
+    private Environment env;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-            .csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sessionManagement -> {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
             })
             .authorizeHttpRequests(request -> {
                 request.requestMatchers(HttpMethod.POST, "/login").permitAll();
                 request.requestMatchers(HttpMethod.POST, "/users").permitAll();
+                if (env.acceptsProfiles(Profiles.of("test"))) {
+                    request.requestMatchers("/h2-console/**").permitAll();
+                }
                 request.anyRequest().authenticated();
             })
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-            .build();
+            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
+            if (env.acceptsProfiles(Profiles.of("test"))) {
+                http.headers(headers -> headers.frameOptions(FrameOptionsConfig::sameOrigin));
+            }
+            return http.build();
     }
 
     @Bean
