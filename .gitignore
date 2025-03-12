@@ -31,5 +31,5 @@ build/
 
 ### project config ###
 src/main/resources/application.yml
-src/main/resources/application-dev.yml
-src/main/resources/application-test.yml
+src/main/resources/application-dev.yml.example
+src/main/resources/application-test.yml.example
