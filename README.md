@@ -33,6 +33,15 @@ Antes de rodar o projeto, crie o arquivo de configuração necessário:
 ```sh
 cp src/main/resources/application.yml.example src/main/resources/application.yml
 ```
+Dev:
+```sh
+cp src/main/resources/application-dev.yml.example src/main/resources/application-dev.yml
+```
+Test:
+```sh
+cp src/main/resources/application-test.yml.example src/main/resources/application-test.yml
+```
+
 Isso criará o arquivo de configuração base para a aplicação.
 
 ## Passos para subir o projeto
