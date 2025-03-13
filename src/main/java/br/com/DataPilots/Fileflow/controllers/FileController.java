@@ -12,7 +12,7 @@ import br.com.DataPilots.Fileflow.entities.File;
 import br.com.DataPilots.Fileflow.repositories.FileRepository;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping("/file")
 public class FileController {
     @Autowired
     private FileRepository fileRepository;
