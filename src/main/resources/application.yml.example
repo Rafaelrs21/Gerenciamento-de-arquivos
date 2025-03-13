@@ -8,3 +8,10 @@ spring:
             secret: ${FILE_FLOW_JWT_SECRET:12345678}
   flyway:
       enabled: true
+  jpa:
+    properties:
+        hibernate:
+            show_sql: true
+            format_sql: true
+            ddl-auto: none
+            dialect: org.hibernate.dialect.PostgreSQLDialect
