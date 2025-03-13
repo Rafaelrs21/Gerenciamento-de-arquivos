@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import br.com.DataPilots.Fileflow.entities.User;
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import br.com.DataPilots.Fileflow.services.TokenService;
 
 import jakarta.servlet.ServletException;
@@ -37,7 +37,7 @@ public class LoginControllerTest {
     private TokenService tokenService;
 
     @MockitoBean
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @Test
     public void LoginValidShouldReturnOk() throws Exception {

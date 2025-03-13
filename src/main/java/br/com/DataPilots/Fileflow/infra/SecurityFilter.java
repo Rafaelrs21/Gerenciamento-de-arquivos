@@ -1,6 +1,6 @@
 package br.com.DataPilots.Fileflow.infra;
 
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import br.com.DataPilots.Fileflow.services.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,7 +17,7 @@ import java.io.IOException;
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
     @Autowired
     private TokenService tokenService;
 
@@ -43,7 +43,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     }
 
     private void authenticate(String subject) {
-        this.usersRepository.findByUsername(subject).ifPresent(user -> {
+        this.userRepository.findByUsername(subject).ifPresent(user -> {
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
         });

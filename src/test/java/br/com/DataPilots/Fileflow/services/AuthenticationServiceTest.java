@@ -1,7 +1,7 @@
 package br.com.DataPilots.Fileflow.services;
 
 import br.com.DataPilots.Fileflow.entities.User;
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import br.com.DataPilots.Fileflow.tests.Factory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ public class AuthenticationServiceTest {
     private AuthenticationService service;
 
     @Mock
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     private User user;
 
@@ -37,7 +37,7 @@ public class AuthenticationServiceTest {
 
     @Test
     public void loadUserByUsernameShouldReturnUserWhenFound() {
-        when(usersRepository.findByUsername("usuario")).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername("usuario")).thenReturn(Optional.of(user));
 
         UserDetails userDetails = service.loadUserByUsername("usuario");
         assertNotNull(userDetails);
@@ -46,7 +46,7 @@ public class AuthenticationServiceTest {
 
     @Test
     public void loadUserByUsernameShouldThrowExceptionWhenUserNotFound() {
-        when(usersRepository.findByUsername("naoexiste")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("naoexiste")).thenReturn(Optional.empty());
 
         UsernameNotFoundException exception = assertThrows(
             UsernameNotFoundException.class,

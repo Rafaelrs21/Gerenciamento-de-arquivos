@@ -1,6 +1,6 @@
 package br.com.DataPilots.Fileflow.services;
 
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthenticationService implements UserDetailsService {
     @Autowired
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var query = this.usersRepository.findByUsername(username);
+        var query = this.userRepository.findByUsername(username);
 
         if (query.isEmpty())
             throw new UsernameNotFoundException("Usuário não encontrado.");

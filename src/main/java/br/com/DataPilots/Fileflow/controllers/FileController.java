@@ -1,6 +1,5 @@
 package br.com.DataPilots.Fileflow.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,7 @@ import br.com.DataPilots.Fileflow.repositories.FileRepository;
 
 @RestController
 @RequestMapping("/files")
-public class FilesController {
+public class FileController {
     @Autowired
     private FileRepository fileRepository;
 
