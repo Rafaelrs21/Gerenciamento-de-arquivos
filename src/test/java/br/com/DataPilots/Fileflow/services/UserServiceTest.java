@@ -3,7 +3,7 @@ package br.com.DataPilots.Fileflow.services;
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.exceptions.InvalidPasswordLengthException;
 import br.com.DataPilots.Fileflow.exceptions.UserAlreadyExistsException;
-import br.com.DataPilots.Fileflow.repositories.UsersRepository;
+import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import br.com.DataPilots.Fileflow.tests.Factory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,15 +16,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UsersServiceTest {
+public class UserServiceTest {
     @InjectMocks
-    private UsersService service;
+    private UserService service;
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private UsersRepository repository;
+    private UserRepository repository;
 
     @Test
     public void shouldCreateAValidUser() {
