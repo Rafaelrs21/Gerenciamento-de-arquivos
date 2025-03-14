@@ -9,46 +9,26 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-@RestController
-@RequestMapping("/user")
+@Controller
 public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping
-    public ResponseEntity<DefaultResponseDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
+    public ResponseEntity<DefaultResponseDTO> createUser(CreateUserRequestDTO request) {
         try {
-            this.userService.create(request.username(), request.password());
-
-            return this.userCreatedResponse();
-        } catch (InvalidUserException exception) {
-            return this.badRequestResponse(exception.getMessage());
+            userService.create(request.username(), request.password());
+            return ResponseEntity.status(201).body(new DefaultResponseDTO("Usuário criado."));
+        } catch (Exception exception) {
+            return ResponseEntity.status(400).body(new DefaultResponseDTO(exception.getMessage()));
         }
     }
 
-    public ResponseEntity<DefaultResponseDTO> badRequestResponse(String message) {
-        var response = new DefaultResponseDTO(message);
-
-        return ResponseEntity.status(400).body(response);
-    }
-
-    public ResponseEntity<DefaultResponseDTO> userCreatedResponse() {
-        var response = new DefaultResponseDTO("Usuário criado.");
-
-        return ResponseEntity.status(201).body(response);
-    }
-
-    @DeleteMapping
-    public ResponseEntity<DefaultResponseDTO> deleteUser(@AuthenticationPrincipal User user) {
+    public ResponseEntity<DefaultResponseDTO> deleteUser(User user) {
         userService.delete(user);
-
-        return this.usersDeletedResponse();
-    }
-
-    private ResponseEntity<DefaultResponseDTO> usersDeletedResponse() {
         return ResponseEntity.ok(new DefaultResponseDTO("Usuário deletado."));
     }
 }
