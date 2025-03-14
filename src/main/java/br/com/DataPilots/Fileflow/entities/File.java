@@ -22,24 +22,12 @@ import lombok.NoArgsConstructor;
 public class File {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
-    //private Long folderId;
     private String name;
-    //private String path;
-    //private String type;
-    //private String size;
-    //private String createdAt;
-    //private String updatedAt;
 
     public Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("id", id);
-        //data.put("folderId", folderId);
         data.put("name", name);
-        //data.put("path", path);
-        //data.put("type", type);
-        //data.put("size", size);
-        //data.put("createdAt", createdAt);
-        //data.put("updatedAt", updatedAt);
         return data;
     }
 }
