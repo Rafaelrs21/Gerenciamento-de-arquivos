@@ -17,13 +17,18 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public void create(String username, String password) throws InvalidUserException {
+    public User find(Long id) {
+        return repository.findById(id).orElseThrow();
+    }
+
+    public User create(String username, String password) throws InvalidUserException {
         this.checkParams(username, password);
 
         String encodedPassword = this.encodePassword(password);
         User user = new User(username, encodedPassword);
 
         this.repository.save(user);
+        return user;
     }
 
     private void checkParams(String username, String password) throws InvalidUserException {
