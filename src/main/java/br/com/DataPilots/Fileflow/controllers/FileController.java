@@ -27,12 +27,6 @@ public class FileController {
     private final FileRepository fileRepository;
     private final FileService fileService;
 
-    /*@GetMapping
-    public List<Map<String, Object>> getAll() {
-        List<File> files = fileRepository.findAll();
-        return files.stream().map(File::serialize).toList();
-    }*/
-
     @GetMapping
     public ResponseEntity<List<File>> getAllFile(@AuthenticationPrincipal User user) {
         List<File> all = fileRepository.findAll();
