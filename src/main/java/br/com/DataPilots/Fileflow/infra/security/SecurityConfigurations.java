@@ -37,7 +37,7 @@ public class SecurityConfigurations {
                 if (env.acceptsProfiles(Profiles.of("test"))) {
                     request.requestMatchers("/h2-console/**").permitAll();
                 }
-                request.anyRequest().authenticated();
+                request.anyRequest().permitAll();
             })
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
             if (env.acceptsProfiles(Profiles.of("test"))) {

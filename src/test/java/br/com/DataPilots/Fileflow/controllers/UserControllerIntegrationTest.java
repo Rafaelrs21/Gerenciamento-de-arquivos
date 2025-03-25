@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
-public class UserControllerIntegrationTests {
+public class UserControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -42,7 +42,7 @@ public class UserControllerIntegrationTests {
     @Test
     public void createValidUser() throws Exception {
         String json = "{\"username\":\"test_username\", \"password\":\"test_password\"}";
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isCreated())
@@ -52,7 +52,7 @@ public class UserControllerIntegrationTests {
     @Test
     public void createInvalidUserWithInvalidPasswordLength() throws Exception {
         String json = "{\"username\":\"test_username\", \"password\":\"short\"}";
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isBadRequest());
@@ -63,7 +63,7 @@ public class UserControllerIntegrationTests {
         User user = Factory.createUser("test_username", passwordEncoder.encode("test_password"));
         usersRepository.save(user);
         String json = "{\"username\":\"test_username\", \"password\":\"test_password\"}";
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json))
             .andExpect(status().isBadRequest())
@@ -75,7 +75,7 @@ public class UserControllerIntegrationTests {
         User user = Factory.createUser("test_username", passwordEncoder.encode("test_password"));
         usersRepository.save(user);
         String userJwtToken = tokenService.generateToken(user);
-        mockMvc.perform(delete("/users")
+        mockMvc.perform(delete("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + userJwtToken))
             .andExpect(status().isOk())

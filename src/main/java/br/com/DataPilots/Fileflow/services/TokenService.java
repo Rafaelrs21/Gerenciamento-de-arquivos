@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import br.com.DataPilots.Fileflow.entities.User;
@@ -14,13 +15,13 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Service
+@RequiredArgsConstructor
 public class TokenService {
     @Value("${spring.application.name}")
     private String issuer;
     @Value("${spring.application.security.token.secret}")
     private String secret;
-    @Autowired
-    private TimeConfig timeConfig;
+    private final TimeConfig timeConfig;
 
     public String generateToken(User user) {
         var algorithm = Algorithm.HMAC256(secret);
