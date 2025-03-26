@@ -21,9 +21,11 @@ public class FileComment {
     private String content;
     @Column(columnDefinition = "TIMESTAMP WITHOUT TIME ZONE")
     private Instant createdAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User userId;
+
     @ManyToOne
     @JoinColumn(name = "file_id")
     private File fileId;
