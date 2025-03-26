@@ -19,9 +19,6 @@ public class File {
     private Long id;
     private String name;
 
-    @OneToMany
-    private Set<FileComment> fileComment = new HashSet<>();
-
     public Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("id", id);
