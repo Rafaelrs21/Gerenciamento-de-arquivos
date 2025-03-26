@@ -37,8 +37,10 @@ public class SecurityConfigurations {
                 if (env.acceptsProfiles(Profiles.of("test"))) {
                     request.requestMatchers("/h2-console/**").permitAll();
                 }
-                request.anyRequest().permitAll();
+                request.anyRequest().authenticated();
             })
+
+
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
             if (env.acceptsProfiles(Profiles.of("test"))) {
                 http.headers(headers -> headers.frameOptions(FrameOptionsConfig::sameOrigin));

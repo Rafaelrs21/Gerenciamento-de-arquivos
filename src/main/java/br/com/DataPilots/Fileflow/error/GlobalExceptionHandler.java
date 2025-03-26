@@ -5,6 +5,8 @@ import br.com.DataPilots.Fileflow.exceptions.InvalidTokenException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
 import br.com.DataPilots.Fileflow.exceptions.UserAlreadyExistsException;
 import br.com.DataPilots.Fileflow.response.DefaultErrorResponse;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
     @ExceptionHandler({InvalidUserException.class})
     public ResponseEntity<Object> handleStudentNotFoundException(InvalidUserException exception) {
