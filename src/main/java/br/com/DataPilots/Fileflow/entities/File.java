@@ -1,13 +1,11 @@
 package br.com.DataPilots.Fileflow.entities;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Table(name="files")
@@ -20,6 +18,9 @@ public class File {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @OneToMany
+    private Set<FileComment> fileComment = new HashSet<>();
 
     public Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<String, Object>();
