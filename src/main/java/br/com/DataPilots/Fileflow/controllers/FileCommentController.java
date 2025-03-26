@@ -14,9 +14,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileCommentController {
     private final FileCommentService fileCommentService;
-    @GetMapping
-    public ResponseEntity<List<FileComment>> getAllComments() {
-        List<FileComment> comments = fileCommentService.findAll();
+
+    @GetMapping("/file/{fileId}")
+    public ResponseEntity<List<FileComment>> getAllCommentsByFile(@PathVariable Long fileId) {
+        List<FileComment> comments = fileCommentService.findAllByFileId(fileId);
+        return ResponseEntity.ok(comments);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<FileComment>> getAllCommentsByUser(@PathVariable Long userId) {
+        List<FileComment> comments = fileCommentService.findAllByUserId(userId);
         return ResponseEntity.ok(comments);
     }
 

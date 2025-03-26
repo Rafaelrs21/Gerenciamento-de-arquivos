@@ -13,8 +13,12 @@ import java.util.Optional;
 public class FileCommentService {
     private final FileCommentRepository fileCommentRepository;
 
-    public List<FileComment> findAll() {
-        return fileCommentRepository.findAll();
+    public List<FileComment> findAllByFileId(Long fileId) {
+        return fileCommentRepository.findByFileId_Id(fileId);
+    }
+
+    public List<FileComment> findAllByUserId(Long userId) {
+        return fileCommentRepository.findByUserId_Id(userId);
     }
 
     public Optional<FileComment> findById(Long id) {
