@@ -2,6 +2,11 @@ spring:
     config:
         activate:
             on-profile: test
+    application:
+            name: "Fileflow"
+            security:
+                token:
+                    secret: ${FILE_FLOW_JWT_SECRET:12345678}
     datasource:
         url: jdbc:h2:mem:testdb
         username: sa
@@ -17,3 +22,7 @@ spring:
                 format_sql: true
                 ddl-auto: none
                 dialect: org.hibernate.dialect.H2Dialect
+integrations:
+    ses:
+        access_key: 111111
+        secret_key: 111111
