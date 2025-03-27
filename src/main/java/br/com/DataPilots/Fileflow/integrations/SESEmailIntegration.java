@@ -1,8 +1,8 @@
 package br.com.DataPilots.Fileflow.integrations;
 
+import br.com.DataPilots.Fileflow.AppConsts;
 import br.com.DataPilots.Fileflow.exceptions.EmailIntegrationException;
 import br.com.DataPilots.Fileflow.integrationInterfaces.EmailIntegrationInterface;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -11,17 +11,24 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
+import java.util.Objects;
+
 
 @Component
 public class SESEmailIntegration implements EmailIntegrationInterface {
-    private static final Region AWS_REGION = Region.US_EAST_1;
-    private static final String SENDER_EMAIL = "breno.nova@al.infnet.edu.br";
+    private final String enviroment;
+    private final Region awsRegion;
+    private final String senderEmail;
     private final String access_key;
     private final String secret_key;
 
     public SESEmailIntegration(Environment env) {
-        access_key = env.getProperty("integrations.ses.access_key");
-        secret_key = env.getProperty("integrations.ses.secret_key");
+        enviroment = env.getProperty("environment");
+        String configGroup = "integrations.ses.";
+        awsRegion = Region.of(Objects.requireNonNull(env.getProperty(configGroup + "aws_region")));
+        senderEmail = env.getProperty(configGroup + "sender_email");
+        access_key = env.getProperty(configGroup + "access_key");
+        secret_key = env.getProperty(configGroup + "secret_key");
     }
 
     @Override
@@ -36,11 +43,13 @@ public class SESEmailIntegration implements EmailIntegrationInterface {
     }
 
     private void sendEmail(String to, String subject, String body) throws EmailIntegrationException {
+        if (!isProduction()) return;
+
         try {
             AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(access_key, secret_key);
 
             SesClient sesClient = SesClient.builder()
-                .region(AWS_REGION)
+                .region(awsRegion)
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
                 .build();
 
@@ -50,6 +59,10 @@ public class SESEmailIntegration implements EmailIntegrationInterface {
         }
     }
 
+    private boolean isProduction() {
+        return Objects.equals(enviroment, AppConsts.ENVIRONMENT_PRODUCTION);
+    }
+
     private SendEmailRequest buildMessage(String to, String subject, String body) {
         return SendEmailRequest.builder()
             .destination(Destination.builder().toAddresses(to).build())
@@ -57,7 +70,7 @@ public class SESEmailIntegration implements EmailIntegrationInterface {
                 .subject(Content.builder().data(subject).build())
                 .body(Body.builder().text(Content.builder().data(body).build()).build())
                 .build())
-            .source(SENDER_EMAIL)
+            .source(senderEmail)
             .build();
     }
 }

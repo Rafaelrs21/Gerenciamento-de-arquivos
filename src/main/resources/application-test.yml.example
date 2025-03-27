@@ -1,3 +1,4 @@
+environment: "test"
 spring:
     config:
         activate:
@@ -24,5 +25,7 @@ spring:
                 dialect: org.hibernate.dialect.H2Dialect
 integrations:
     ses:
-        access_key: 111111
-        secret_key: 111111
+        aws_region: "us-east-1"
+        sender_email: "fulano@de.tal.com.br"
+        access_key: "111111"
+        secret_key: "111111"
