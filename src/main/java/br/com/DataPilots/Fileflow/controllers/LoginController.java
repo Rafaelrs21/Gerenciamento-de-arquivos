@@ -6,6 +6,7 @@ import br.com.DataPilots.Fileflow.dtos.TokenResponseDTO;
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.services.TokenService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,11 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/login")
+@RequiredArgsConstructor
 public class LoginController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private TokenService tokenService;
+
+    private final AuthenticationManager authenticationManager;
+
+    private final TokenService tokenService;
 
     @PostMapping
     public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {

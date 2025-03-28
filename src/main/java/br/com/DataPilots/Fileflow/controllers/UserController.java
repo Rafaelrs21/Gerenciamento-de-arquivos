@@ -6,7 +6,7 @@ import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
 import br.com.DataPilots.Fileflow.services.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<DefaultResponseDTO> createUser(@Valid @RequestBody CreateUserRequestDTO request) {
