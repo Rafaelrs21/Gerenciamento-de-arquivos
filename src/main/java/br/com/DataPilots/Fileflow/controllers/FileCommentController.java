@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/file-comments")
+@RequestMapping("/file-comment")
 @RequiredArgsConstructor
 public class FileCommentController {
     private final FileCommentService fileCommentService;
