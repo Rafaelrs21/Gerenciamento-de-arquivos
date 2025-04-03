@@ -3,7 +3,7 @@ package br.com.DataPilots.Fileflow.controllers;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,9 +13,9 @@ import br.com.DataPilots.Fileflow.repositories.FileRepository;
 
 @RestController
 @RequestMapping("/file")
+@RequiredArgsConstructor
 public class FileController {
-    @Autowired
-    private FileRepository fileRepository;
+    private final FileRepository fileRepository;
 
     @GetMapping
     public List<Map<String, Object>> getAll() {
