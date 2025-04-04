@@ -48,7 +48,7 @@ public class FileController {
         }
     }
 
-    @GetMapping("/user")
+    @GetMapping
     public List<Map<String, Object>> getFilesByUser(@AuthenticationPrincipal User user) {
         return fileService.getFilesByUser(user.getId()).stream().map(File::serialize).toList();
     }
