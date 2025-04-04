@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "group_users")
@@ -26,14 +27,14 @@ public class GroupUser {
     @JoinColumn(nullable = false)
     private User user;
 
+    @CreationTimestamp
     @Column(name = "joined_at")
-    private LocalDateTime joinedAt;
+    private Instant joinedAt;
 
     public GroupUser(Group group, User user) {
         this.id = new GroupUserPK(group.getId(), user.getId());
         this.group = group;
         this.user = user;
-        this.joinedAt = LocalDateTime.now();
     }
 
     @Data
