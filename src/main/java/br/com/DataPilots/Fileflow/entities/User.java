@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Table(name="users")
 @Entity(name="User")
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of="id")
