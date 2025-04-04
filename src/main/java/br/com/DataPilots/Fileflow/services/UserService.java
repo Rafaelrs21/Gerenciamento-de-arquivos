@@ -6,16 +6,18 @@ import br.com.DataPilots.Fileflow.exceptions.InvalidPasswordLengthException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
 import br.com.DataPilots.Fileflow.exceptions.UserAlreadyExistsException;
 import br.com.DataPilots.Fileflow.repositories.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    private UserRepository repository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+
+    private final UserRepository repository;
+
+    private final PasswordEncoder passwordEncoder;
 
     public User find(Long id) {
         return repository.findById(id).orElseThrow();

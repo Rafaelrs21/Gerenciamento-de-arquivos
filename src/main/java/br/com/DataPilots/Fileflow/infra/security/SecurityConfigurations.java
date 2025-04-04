@@ -39,6 +39,8 @@ public class SecurityConfigurations {
                 }
                 request.anyRequest().authenticated();
             })
+
+
             .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
             if (env.acceptsProfiles(Profiles.of("test"))) {
                 http.headers(headers -> headers.frameOptions(FrameOptionsConfig::sameOrigin));

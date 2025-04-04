@@ -45,7 +45,7 @@ public class UserControllerTest {
         String username = "test_username";
         String password = "test_password";
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}"))
             .andExpect(status().isCreated())
@@ -57,7 +57,7 @@ public class UserControllerTest {
         String username = "test_username";
         String password = "short";
 
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}"))
             .andExpect(status().isBadRequest());
@@ -68,7 +68,7 @@ public class UserControllerTest {
         String username = "test_username";
         String password = "test_password";
         doThrow(UserAlreadyExistsException.class).when(usersService).create(username, password);
-        mockMvc.perform(post("/users")
+        mockMvc.perform(post("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}"))
             .andExpect(status().isBadRequest())
@@ -81,7 +81,7 @@ public class UserControllerTest {
         String password = "test_password";
         User user = Factory.createUser(username, passwordEncoder.encode(password));
         String userJwtToken = tokenService.generateToken(user);
-        mockMvc.perform(delete("/users")
+        mockMvc.perform(delete("/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Bearer " + userJwtToken))
             .andExpect(status().isOk())
