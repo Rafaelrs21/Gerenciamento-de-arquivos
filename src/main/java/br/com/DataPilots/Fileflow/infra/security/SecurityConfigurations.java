@@ -34,6 +34,7 @@ public class SecurityConfigurations {
             .authorizeHttpRequests(request -> {
                 request.requestMatchers(HttpMethod.POST, "/login").permitAll();
                 request.requestMatchers(HttpMethod.POST, "/user").permitAll();
+                request.requestMatchers(HttpMethod.POST, "/file").permitAll();
                 if (env.acceptsProfiles(Profiles.of("test"))) {
                     request.requestMatchers("/h2-console/**").permitAll();
                 }
