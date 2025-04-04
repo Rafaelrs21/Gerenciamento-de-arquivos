@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 
 @Table(name="users")
 @Entity(name="User")
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of="id")
