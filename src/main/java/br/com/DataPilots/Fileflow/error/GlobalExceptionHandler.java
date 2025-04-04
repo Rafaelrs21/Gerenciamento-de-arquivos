@@ -20,7 +20,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({InvalidUserException.class})
-    public ResponseEntity<Object> handleStudentNotFoundException(InvalidUserException exception) {
+    public ResponseEntity<Object> handleUserNotFoundException(InvalidUserException exception) {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(exception.getMessage());

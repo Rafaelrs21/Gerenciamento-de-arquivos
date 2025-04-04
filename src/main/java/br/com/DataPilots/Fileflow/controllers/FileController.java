@@ -6,13 +6,12 @@ import br.com.DataPilots.Fileflow.services.FileService;
 import br.com.DataPilots.Fileflow.dtos.DefaultResponseDTO;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/file")
@@ -24,13 +23,14 @@ public class FileController {
     @PostMapping
     public ResponseEntity<DefaultResponseDTO> createFile(@AuthenticationPrincipal User user,
                                                          @RequestBody File request) {
+
         try {
             fileService.create(
                 request.getName(),
                 request.getMimeType(),
                 request.getBase64(),
                 user.getId(),
-                request.getFolderId()
+                request.getFolderId() != null ? request.getFolderId() : 0
             );
             return this.fileCreatedResponse();
         } catch (InvalidFileException exception) {
@@ -38,13 +38,23 @@ public class FileController {
         }
     }
 
-    @GetMapping("/download/{name}")
-    public ResponseEntity<?> downloadFile(@PathVariable String name) {
+    @GetMapping("/download/{folderId}/{fileName}")
+    public ResponseEntity<byte[]> downloadFile(@AuthenticationPrincipal User user,
+                                               @PathVariable String folderId,
+                                               @PathVariable String fileName) {
+
+
         try {
-            String base64File = fileService.downloadFile(name);
-            return ResponseEntity.ok(Map.of("fileName", name, "base64", base64File));
-        } catch (InvalidFileException e) {
-            return this.badRequestResponse(e.getMessage());
+            Long folder = Objects.equals(folderId, "null") ? 0 : Long.parseLong(folderId);
+            String base64File = fileService.downloadFile(fileName,user.getId(),folder);
+
+            byte[] fileBytes =  Base64.getDecoder().decode(base64File);
+            return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .body(fileBytes);
+        }
+        catch (InvalidFileException | IllegalArgumentException e) {
+          throw new InvalidFileException();
         }
     }
 
@@ -53,9 +63,11 @@ public class FileController {
         return fileService.getFilesByUser(user.getId()).stream().map(File::serialize).toList();
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<DefaultResponseDTO> deleteFile(@PathVariable String name, @AuthenticationPrincipal User user) {
-        Optional<File> fileOptional = fileService.getFileByName(name);
+    @DeleteMapping("/{folderId}/{fileName}")
+    public ResponseEntity<DefaultResponseDTO> deleteFile(@AuthenticationPrincipal User user,
+                                                         @RequestParam Long folderId,
+                                                         @RequestParam String fileName) {
+        Optional<File> fileOptional = fileService.findByNameAndUserIdAndFolderId(fileName,user.getId(),folderId);
 
         if (fileOptional.isEmpty()) {
             return this.badRequestResponse("Arquivo não encontrado.");
