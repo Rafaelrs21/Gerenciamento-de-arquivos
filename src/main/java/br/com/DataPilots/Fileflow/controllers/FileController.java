@@ -30,11 +30,21 @@ public class FileController {
                 request.getMimeType(),
                 request.getBase64(),
                 user.getId(),
-                request.getFolderId() != null ? request.getFolderId() : null
+                request.getFolderId()
             );
             return this.fileCreatedResponse();
         } catch (InvalidFileException exception) {
             return this.badRequestResponse(exception.getMessage());
+        }
+    }
+
+    @GetMapping("/download/{name}")
+    public ResponseEntity<?> downloadFile(@PathVariable String name) {
+        try {
+            String base64File = fileService.downloadFile(name);
+            return ResponseEntity.ok(Map.of("fileName", name, "base64", base64File));
+        } catch (InvalidFileException e) {
+            return this.badRequestResponse(e.getMessage());
         }
     }
 

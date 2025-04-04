@@ -29,6 +29,16 @@ public class FileService {
         this.repository.save(file);
     }
 
+    public String downloadFile(String name) throws InvalidFileException {
+        Optional<File> fileOptional = this.repository.findByName(name);
+
+        if (fileOptional.isEmpty()) {
+            throw new InvalidFileException();
+        }
+
+        return fileOptional.get().getBase64();
+    }
+
     private void checkParams(String name, String base64) throws InvalidFileException {
         if (base64 == null || base64.isBlank()) {
             throw new InvalidFileException();

@@ -18,6 +18,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
+
     @ExceptionHandler({InvalidUserException.class})
     public ResponseEntity<Object> handleStudentNotFoundException(InvalidUserException exception) {
         return ResponseEntity
