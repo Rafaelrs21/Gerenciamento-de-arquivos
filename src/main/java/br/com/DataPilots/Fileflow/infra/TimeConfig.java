@@ -1,4 +1,4 @@
-package br.com.DataPilots.Fileflow.services;
+package br.com.DataPilots.Fileflow.infra;
 
 
 import org.springframework.context.annotation.Bean;

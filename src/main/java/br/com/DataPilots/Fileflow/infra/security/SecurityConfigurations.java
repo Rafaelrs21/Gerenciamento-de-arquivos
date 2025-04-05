@@ -35,6 +35,7 @@ public class SecurityConfigurations {
                 request.requestMatchers(HttpMethod.POST, "/login").permitAll();
                 request.requestMatchers(HttpMethod.POST, "/user").permitAll();
                 request.requestMatchers(HttpMethod.POST, "/file").permitAll();
+                request.requestMatchers("/password_recovery").permitAll();
                 if (env.acceptsProfiles(Profiles.of("test"))) {
                     request.requestMatchers("/h2-console/**").permitAll();
                 }

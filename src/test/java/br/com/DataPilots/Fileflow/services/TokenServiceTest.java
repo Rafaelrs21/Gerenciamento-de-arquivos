@@ -11,6 +11,7 @@ import br.com.DataPilots.Fileflow.exceptions.InvalidTokenException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
+import br.com.DataPilots.Fileflow.infra.TimeConfig;
 import br.com.DataPilots.Fileflow.tests.Factory;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
