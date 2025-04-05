@@ -30,6 +30,9 @@ public class Group {
     @Column(nullable = false)
     private List<GroupUser> members = new ArrayList<>();
 
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL)
+    private List<FileGroupPermission> filePermissions = new ArrayList<>();
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private Instant createdAt;

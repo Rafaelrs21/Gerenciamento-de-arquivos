@@ -59,4 +59,10 @@ public class GroupService {
     public void deleteById(Long id) {
         groupRepository.deleteById(id);
     }
+
+    public List<Group> getUserGroups(Long userId) {
+        return groupRepository.findAll().stream()
+            .filter(group -> isMember(group.getId(), userId))
+            .toList();
+    }
 }
