@@ -6,11 +6,13 @@ import br.com.DataPilots.Fileflow.services.FileService;
 import br.com.DataPilots.Fileflow.dtos.DefaultResponseDTO;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @RestController
@@ -42,21 +44,28 @@ public class FileController {
     public ResponseEntity<byte[]> downloadFile(@AuthenticationPrincipal User user,
                                                @PathVariable String folderId,
                                                @PathVariable String fileName) {
-
-
         try {
             Long folder = Objects.equals(folderId, "null") ? 0 : Long.parseLong(folderId);
-            String base64File = fileService.downloadFile(fileName,user.getId(),folder);
 
-            byte[] fileBytes =  Base64.getDecoder().decode(base64File);
-            return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                .body(fileBytes);
-        }
-        catch (InvalidFileException | IllegalArgumentException e) {
-          throw new InvalidFileException();
+            String base64File = fileService.downloadFile(fileName, user.getId(), folder);
+            byte[] fileBytes = Base64.getDecoder().decode(base64File);
+
+            String contentType = Files.probeContentType(Path.of(fileName));
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.setContentDisposition(ContentDisposition.inline().filename(fileName).build());
+
+            return new ResponseEntity<>(fileBytes, headers, HttpStatus.OK);
+
+        } catch (InvalidFileException | IllegalArgumentException | IOException e) {
+            throw new InvalidFileException();
         }
     }
+
 
     @GetMapping
     public List<Map<String, Object>> getFilesByUser(@AuthenticationPrincipal User user) {
@@ -65,16 +74,15 @@ public class FileController {
 
     @DeleteMapping("/{folderId}/{fileName}")
     public ResponseEntity<DefaultResponseDTO> deleteFile(@AuthenticationPrincipal User user,
-                                                         @RequestParam Long folderId,
-                                                         @RequestParam String fileName) {
-        Optional<File> fileOptional = fileService.findByNameAndUserIdAndFolderId(fileName,user.getId(),folderId);
+                                                         @PathVariable Long folderId,
+                                                         @PathVariable String fileName) {
+        Optional<File> fileOptional = fileService.findByNameAndUserIdAndFolderId(fileName, user.getId(), folderId);
 
         if (fileOptional.isEmpty()) {
             return this.badRequestResponse("Arquivo não encontrado.");
         }
 
         File file = fileOptional.get();
-
 
         if (!file.getUserId().equals(user.getId())) {
             return this.badRequestResponse("Você não tem permissão para excluir este arquivo.");
@@ -83,6 +91,7 @@ public class FileController {
         fileService.delete(file);
         return this.fileDeletedResponse();
     }
+
 
     private ResponseEntity<DefaultResponseDTO> badRequestResponse(String message) {
         var response = new DefaultResponseDTO(message);
