@@ -67,14 +67,9 @@ public class LoginControllerTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
             .thenThrow(new BadCredentialsException("Credenciais inválidas"));
 
-        ServletException exception = assertThrows(ServletException.class, () -> {
-            mockMvc.perform(post("/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"username\":\"" + username + "\",\"password\":\"" + wrongPassword + "\"}"))
-                .andReturn();
-        });
-        Throwable cause = exception.getCause();
-        assertNotNull(cause);
-        assertTrue(cause instanceof BadCredentialsException);
+        mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"username\":\"" + username + "\",\"password\":\"" + wrongPassword + "\"}"))
+            .andExpect(status().isForbidden());
     }
 }
