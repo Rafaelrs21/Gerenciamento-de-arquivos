@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,10 +28,14 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<TokenResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) {
-        var token = new UsernamePasswordAuthenticationToken(request.username(), request.password());
-        var authentication = this.authenticationManager.authenticate(token);
+        try {
+            var token = new UsernamePasswordAuthenticationToken(request.username(), request.password());
+            var authentication = this.authenticationManager.authenticate(token);
 
-        String jwtToken = this.tokenService.generateToken((User) authentication.getPrincipal());
-        return ResponseEntity.ok(new TokenResponseDTO(jwtToken));
+            String jwtToken = this.tokenService.generateToken((User) authentication.getPrincipal());
+            return ResponseEntity.ok(new TokenResponseDTO(jwtToken));
+        } catch (AuthenticationException exception) {
+            return ResponseEntity.status(403).body(new TokenResponseDTO(exception.getMessage()));
+        }
     }
 }

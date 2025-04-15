@@ -5,36 +5,39 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.exceptions.InvalidTokenException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 
+import br.com.DataPilots.Fileflow.infra.TimeConfig;
 import br.com.DataPilots.Fileflow.tests.Factory;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.core.env.Environment;
 
 @ExtendWith(MockitoExtension.class)
 public class TokenServiceTest {
 
-    @InjectMocks
     private TokenService tokenService;
 
-    @Mock
+    private Environment env;
     private TimeConfig timeConfig;
 
     @BeforeEach
     public void setUp() {
-        ReflectionTestUtils.setField(tokenService, "issuer", "FileFlow");
-        ReflectionTestUtils.setField(tokenService, "secret", "user1");
+        env = Mockito.mock(Environment.class);
+        timeConfig = Mockito.mock(TimeConfig.class);
+        when(env.getProperty("spring.application.name")).thenReturn("FileFlow");
+        when(env.getProperty("spring.application.security.token.secret")).thenReturn("user1");
         lenient().when(timeConfig.zoneOffset()).thenReturn(ZoneOffset.of("-3"));
+        tokenService = new TokenService(env, timeConfig);
     }
 
     @Test

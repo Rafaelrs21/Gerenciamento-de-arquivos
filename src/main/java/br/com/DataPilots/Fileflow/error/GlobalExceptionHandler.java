@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -18,8 +19,9 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler {
+
     @ExceptionHandler({InvalidUserException.class})
-    public ResponseEntity<Object> handleStudentNotFoundException(InvalidUserException exception) {
+    public ResponseEntity<Object> handleUserNotFoundException(InvalidUserException exception) {
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .body(exception.getMessage());
@@ -41,6 +43,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({InvalidPasswordLengthException.class})
     public ResponseEntity<Object> handleInvalidPasswordLengthExection(InvalidPasswordLengthException exception) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(exception.getMessage());
+    }
+
+    @ExceptionHandler({MethodArgumentNotValidException.class})
+    public ResponseEntity<Object> handleInvalidBodyException(InvalidPasswordLengthException exception) {
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(exception.getMessage());
