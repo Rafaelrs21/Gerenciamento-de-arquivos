@@ -26,7 +26,15 @@ public class FileService {
         long size = decodedBytes.length;
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
-        File file = new File(null, name, mimeType, base64, size, now, userId, folderId);
+        File file = File.builder()
+                .name(name)
+                .mimeType(mimeType)
+                .base64(base64)
+                .size(size)
+                .createdAt(now)
+                .userId(userId)
+                .folderId(folderId)
+                .build();
         this.repository.save(file);
     }
 

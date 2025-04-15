@@ -1,6 +1,7 @@
 package br.com.DataPilots.Fileflow.entities;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,7 @@ import lombok.*;
 @Table(name="files")
 @Entity(name="File")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of="id")
