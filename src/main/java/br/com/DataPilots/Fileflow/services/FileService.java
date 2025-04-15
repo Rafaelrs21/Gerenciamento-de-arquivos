@@ -1,7 +1,6 @@
 package br.com.DataPilots.Fileflow.services;
 
 import br.com.DataPilots.Fileflow.entities.File;
-import br.com.DataPilots.Fileflow.entities.Folder;
 import br.com.DataPilots.Fileflow.repositories.FileRepository;
 import br.com.DataPilots.Fileflow.exceptions.FileAlreadyExistsException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
@@ -15,11 +14,11 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class FileService {
+    public class FileService {
 
-    private final FileRepository repository;
+        private final FileRepository repository;
 
-    public void create(String name, String mimeType, String base64, Long userId, Long folderId) throws InvalidFileException {
+        public void create(String name, String mimeType, String base64, Long userId, Long folderId) throws InvalidFileException {
         this.checkParams(name,userId, folderId, base64);
 
         byte[] decodedBytes = Base64.getDecoder().decode(base64);
