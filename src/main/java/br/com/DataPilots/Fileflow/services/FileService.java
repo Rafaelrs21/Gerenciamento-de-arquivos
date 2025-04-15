@@ -1,9 +1,12 @@
 package br.com.DataPilots.Fileflow.services;
 
 import br.com.DataPilots.Fileflow.entities.File;
+import br.com.DataPilots.Fileflow.entities.FileVersion;
 import br.com.DataPilots.Fileflow.repositories.FileRepository;
 import br.com.DataPilots.Fileflow.exceptions.FileAlreadyExistsException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
+import br.com.DataPilots.Fileflow.repositories.FileVersionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import java.util.Optional;
     public class FileService {
 
         private final FileRepository repository;
+        private final FileVersionRepository fileVersionRepository;
 
         public void create(String name, String mimeType, String base64, Long userId, Long folderId) throws InvalidFileException {
         this.checkParams(name,userId, folderId, base64);
@@ -48,6 +52,33 @@ import java.util.Optional;
             throw new FileAlreadyExistsException();
         }
     }
+
+    @Transactional
+    public FileVersion updateFile(File updatedFile, Long userId) {
+        File existingFile = repository.findById(updatedFile.getId())
+            .orElseThrow(() -> new RuntimeException("Arquivo não encontrado"));
+
+        if (!existingFile.getUserId().equals(userId)) {
+            throw new RuntimeException("Usuário sem permissão");
+        }
+
+        int lastVersion = Optional.ofNullable(
+            fileVersionRepository.findTopByFileOrderByVersionNumberDesc(existingFile)
+        ).map(FileVersion::getVersionNumber).orElse(0);
+
+        FileVersion versionSnapshot = new FileVersion(existingFile, lastVersion + 1);
+        fileVersionRepository.save(versionSnapshot);
+
+        existingFile.setName(updatedFile.getName());
+        existingFile.setMimeType(updatedFile.getMimeType());
+        existingFile.setBase64(updatedFile.getBase64());
+        existingFile.setSize((long) Base64.getDecoder().decode(updatedFile.getBase64()).length);
+        existingFile.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+        repository.save(existingFile);
+
+        return versionSnapshot;
+    }
+
 
     public boolean isFileNameInUse(String name, Long userId, Long folderId) {
          List<File> fileList = this.repository.findByUserIdAndFolderId(userId, folderId);

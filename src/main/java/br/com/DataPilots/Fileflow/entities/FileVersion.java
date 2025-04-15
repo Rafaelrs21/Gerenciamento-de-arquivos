@@ -1,12 +1,10 @@
 package br.com.DataPilots.Fileflow.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "file_versions")
@@ -19,21 +17,24 @@ public class FileVersion {
     private Long id;
 
     private Integer versionNumber;
-    private String comment;
+
+    private String name;
+    private String mimeType;
+    private String base64;
+    private Long size;
+    private Timestamp createdAt;
 
     @ManyToOne
     @JoinColumn(name = "file_id", nullable = false)
     private File file;
 
-
-    public Map<String, Object> serialize() {
-        Map<String, Object> data = new HashMap<>();
-        data.put("id", id);
-        data.put("fileId", file != null ? file.getId() : null);
-        data.put("versionNumber", versionNumber);
-        data.put("comment", comment);
-        return data;
+    public FileVersion(File file, Integer versionNumber) {
+        this.file = file;
+        this.versionNumber = versionNumber;
+        this.name = file.getName();
+        this.mimeType = file.getMimeType();
+        this.base64 = file.getBase64();
+        this.size = file.getSize();
+        this.createdAt = file.getCreatedAt();
     }
 }
-
-

@@ -1,6 +1,7 @@
 package br.com.DataPilots.Fileflow.controllers;
 
 import br.com.DataPilots.Fileflow.entities.File;
+import br.com.DataPilots.Fileflow.entities.FileVersion;
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.services.FileService;
 import br.com.DataPilots.Fileflow.dtos.DefaultResponseDTO;
@@ -92,6 +93,26 @@ public class FileController {
         return this.fileDeletedResponse();
     }
 
+    @PutMapping("/{fileId}")
+    public ResponseEntity<Map<String, Object>> updateFile(@AuthenticationPrincipal User user,
+                                                          @PathVariable Long fileId,
+                                                          @RequestBody File fileUpdate) {
+        try {
+            fileUpdate.setId(fileId);
+            FileVersion version = fileService.updateFile(fileUpdate, user.getId());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Arquivo atualizado com versionamento automático.");
+            response.put("versionId", version.getId());
+            response.put("versionNumber", version.getVersionNumber());
+
+            return ResponseEntity.ok(response);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", e.getMessage()));
+        }
+    }
 
     private ResponseEntity<DefaultResponseDTO> badRequestResponse(String message) {
         var response = new DefaultResponseDTO(message);

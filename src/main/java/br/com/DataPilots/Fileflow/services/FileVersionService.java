@@ -2,7 +2,6 @@ package br.com.DataPilots.Fileflow.services;
 
 import br.com.DataPilots.Fileflow.entities.File;
 import br.com.DataPilots.Fileflow.entities.FileVersion;
-import br.com.DataPilots.Fileflow.repositories.FileRepository;
 import br.com.DataPilots.Fileflow.repositories.FileVersionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
