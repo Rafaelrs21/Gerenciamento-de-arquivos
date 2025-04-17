@@ -1,7 +1,9 @@
 package br.com.DataPilots.Fileflow.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
@@ -10,6 +12,8 @@ import java.sql.Timestamp;
 @Table(name = "file_versions")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of="id")
 public class FileVersion {
 
     @Id

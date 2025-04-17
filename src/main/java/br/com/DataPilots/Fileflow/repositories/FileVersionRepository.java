@@ -10,9 +10,9 @@ import java.util.List;
 @Repository
 public interface FileVersionRepository extends JpaRepository<FileVersion, Long> {
 
-    List<FileVersion> findByFileOrderByVersionNumberDesc(File file);
+    List<FileVersion> findByFileIdOrderByVersionNumberDesc(Long fileId);
+
 
     FileVersion findTopByFileOrderByVersionNumberDesc(File file);
 
-    boolean existsByFileAndVersionNumber(File file, Integer versionNumber);
 }

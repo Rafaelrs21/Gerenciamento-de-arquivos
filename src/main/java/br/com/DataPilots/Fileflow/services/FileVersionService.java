@@ -14,9 +14,10 @@ public class FileVersionService {
 
     private final FileVersionRepository fileVersionRepository;
 
-    public List<FileVersion> listVersionsByFileId(File file) {
-        return fileVersionRepository.findByFileOrderByVersionNumberDesc(file);
+    public List<FileVersion> listVersionsByFileId(Long fileId) {
+        return fileVersionRepository.findByFileIdOrderByVersionNumberDesc(fileId);
     }
+
 
     public FileVersion getVersionById(Long versionId) {
         return fileVersionRepository.findById(versionId)
