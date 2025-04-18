@@ -59,6 +59,10 @@ public class FileService {
         return this.repository.findByNameAndUserIdAndFolderId(name, userId, folderId);
     }
 
+    public List<File> getFilesByFolder(Long userId, Long folderId) {
+        return this.repository.findByUserIdAndFolderId(userId, folderId);
+    }
+
     public List<File> getFilesByUser(Long userId) {
         return this.repository.findByUserId(userId);
     }
