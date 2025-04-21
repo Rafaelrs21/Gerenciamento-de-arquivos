@@ -46,19 +46,32 @@ Isso criará o arquivo de configuração base para a aplicação.
 
 ## Passos para subir o projeto
 
-1. **Subir o banco de dados**
+1. **Subir uma network**
+   ```sh
+   docker network create file-flow-network
+   ```
+   Isso iniciará a network necessária para comunicar o BD e a APP.
+
+2. **Subir o banco de dados**
    ```sh
    docker-compose -f docker-compose.dev-database.yml up -d
    ```
    Isso iniciará o banco de dados em segundo plano.
 
-2. **Rodar a aplicação Spring Boot**
+3. **Subir o fileflow project**
+   ```sh
+   docker-compose -f docker-compose.app.yml up --build
+   ```
+   Isso iniciará o projeto em segundo plano.
+
+4. **Rodar a aplicação Spring Boot**
    ```sh
    ./mvnw spring-boot:run
    ```
-   Isso compilará e iniciará o servidor.
+   Isso compilará e iniciará o servidor
+   (Se estiver utilizando em memória).
 
-3. **Acessar a aplicação**
+6. **Acessar a aplicação**
    Normalmente, o projeto estará disponível em:
    ```
    http://localhost:8080
@@ -70,6 +83,18 @@ Para desligar o banco de dados, execute:
 docker-compose -f docker-compose.dev-database.yml down
 ```
 Isso encerrará os containers do banco de dados.
+
+Para desligar o fileflow , execute:
+```sh
+docker-compose -f docker-compose.app.yml down
+```
+Isso encerrará os containers do app.
+
+Para desligar a network, execute:
+```sh
+docker network rm file-flow-network
+```
+Isso encerrará a network do projeto.
 
 Se precisar interromper a aplicação Spring Boot, basta pressionar `CTRL + C` no terminal onde ela está rodando.
 
