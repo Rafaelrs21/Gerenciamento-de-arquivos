@@ -1,25 +1,25 @@
 package br.com.DataPilots.Fileflow.services;
 
 import br.com.DataPilots.Fileflow.dtos.CreateFileShareDTO;
+import br.com.DataPilots.Fileflow.dtos.SharePermissionDTO;
 import br.com.DataPilots.Fileflow.entities.File;
 import br.com.DataPilots.Fileflow.entities.FileShare;
 import br.com.DataPilots.Fileflow.entities.FileSharePermission;
 import br.com.DataPilots.Fileflow.entities.User;
-import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
-import br.com.DataPilots.Fileflow.exceptions.InvalidShareException;
-import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
-import br.com.DataPilots.Fileflow.exceptions.InvalidUserIdException;
-import br.com.DataPilots.Fileflow.exceptions.SharePermissionDeniedException;
+import br.com.DataPilots.Fileflow.exceptions.*;
 import br.com.DataPilots.Fileflow.repositories.FileRepository;
 import br.com.DataPilots.Fileflow.repositories.FileShareRepository;
 import br.com.DataPilots.Fileflow.repositories.FileSharePermissionRepository;
 import br.com.DataPilots.Fileflow.repositories.UserRepository;
 import br.com.DataPilots.Fileflow.utils.ShareTokenGenerator;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,79 +30,109 @@ public class FileShareService {
     private final FileSharePermissionRepository fileSharePermissionRepository;
 
     @Transactional
-    public FileShare createShare(CreateFileShareDTO dto) {
-        File file = fileRepository.findById(dto.getFileId())
-                .orElseThrow(InvalidFileException::new);
+    public FileShare createShare(CreateFileShareDTO createFileShareDTO, Long userId) {
+        File file = fileRepository.findById(createFileShareDTO.getFileId())
+            .orElseThrow(() -> new FileNotFoundException("Arquivo não encontrado"));
 
-        User owner = userRepository.findById(dto.getOwnerId())
-                .orElseThrow(InvalidUserIdException::new);
+        User owner = userRepository.findById(userId)
+            .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
+
+        if (!file.getUserId().equals(userId)) {
+            throw new UnauthorizedOperationException("Usuário não tem permissão para compartilhar este arquivo");
+        }
 
         FileShare share = new FileShare();
         share.setFile(file);
         share.setOwner(owner);
-        share.setExpiresAt(dto.getExpiresAt());
-        share.setPublic(dto.isPublic());
-        share.setTemporary(dto.isTemporary());
+        share.setPublico(createFileShareDTO.isPublico());
+        share.setExpiresAt(createFileShareDTO.getExpiresAt());
+        share.setTemporario(createFileShareDTO.isTemporario());
 
-        FileShare savedShare = fileShareRepository.save(share);
+        // Salva o compartilhamento primeiro para ter o ID
+        share = fileShareRepository.save(share);
 
-        if (dto.getUserIds() != null) {
-            for (Long userId : dto.getUserIds()) {
-                User user = userRepository.findById(userId)
-                        .orElseThrow(InvalidUserIdException::new);
+        // Adiciona as permissões se não for público ou mesmo se for público mas tiver permissões específicas
+        if (createFileShareDTO.getPermissions() != null && !createFileShareDTO.getPermissions().isEmpty()) {
+            for (SharePermissionDTO permissionDTO : createFileShareDTO.getPermissions()) {
+                User user = userRepository.findById(permissionDTO.getUserId())
+                    .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado"));
 
                 FileSharePermission permission = new FileSharePermission();
-                permission.setFileShare(savedShare);
+                permission.setFileShare(share);
                 permission.setUser(user);
-                permission.setCanEdit(dto.isCanEdit());
-                permission.setCanShare(dto.isCanShare());
-                
+                permission.setCanEdit(permissionDTO.isCanEdit());
+                permission.setCanShare(permissionDTO.isCanShare());
                 fileSharePermissionRepository.save(permission);
+                share.getPermissions().add(permission);
             }
         }
 
-        return savedShare;
+        // Recarrega o compartilhamento para garantir que todas as permissões estejam presentes
+        return fileShareRepository.findById(share.getId())
+            .orElseThrow(() -> new InvalidShareException("Erro ao criar compartilhamento"));
     }
 
-    public FileShare findById(Long id) {
-        return fileShareRepository.findById(id)
-                .orElseThrow(InvalidShareException::new);
+    public Optional<FileShare> findById(Long id) {
+        return fileShareRepository.findById(id);
     }
 
-    public FileShare findByPublicToken(String token) {
-        // Extrai a seed do token (primeiros 8 caracteres)
-        String seed = token.substring(0, 8);
-        
-        FileShare share = fileShareRepository.findByShareSeed(seed)
-                .orElseThrow(InvalidShareException::new);
-        
-        if (share.isExpired()) {
-            throw new InvalidShareException();
+    public Optional<FileShare> findByPublicToken(String token) {
+        try {
+            System.out.println("Buscando share com token: " + token);
+            List<FileShare> shares = fileShareRepository.findAllPublicAndNotExpired();
+            System.out.println("Shares públicos encontrados: " + shares.size());
+            
+            for (FileShare share : shares) {
+                if (!share.isPublico()) {
+                    continue;
+                }
+                
+                String generatedToken = share.getPublicToken();
+                System.out.println("Share ID: " + share.getId() + 
+                                 ", Seed: " + share.getShareSeed() + 
+                                 ", Token gerado: " + generatedToken + 
+                                 ", Token recebido: " + token +
+                                 ", É público: " + share.isPublico());
+                
+                if (token.equals(generatedToken)) {
+                    return Optional.of(share);
+                }
+            }
+            
+            return Optional.empty();
+        } catch (Exception e) {
+            System.out.println("Erro ao buscar share: " + e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
         }
-        
-        if (!share.isPublic()) {
-            throw new SharePermissionDeniedException();
-        }
-        
-        // Valida se o token gerado a partir da seed é igual ao token fornecido
-        if (!ShareTokenGenerator.validateToken(seed, token)) {
-            throw new InvalidShareException();
-        }
-        
-        return share;
     }
 
-    public FileShare findByIdAndUser(Long id, Long userId) {
-        FileShare share = findById(id);
+    public Optional<FileShare> findByIdAndUser(Long id, Long userId) {
+        Optional<FileShare> shareOpt = findById(id);
+        
+        if (shareOpt.isEmpty()) {
+            return Optional.empty();
+        }
+        
+        FileShare share = shareOpt.get();
+        
+        if (share.getOwner().getId().equals(userId) || 
+            share.getFile().getUserId().equals(userId)) {
+            return Optional.of(share);
+        }
+        
+        if (share.isPublico() && !share.isExpired()) {
+            return Optional.of(share);
+        }
         
         boolean hasPermission = share.getPermissions().stream()
                 .anyMatch(permission -> permission.getUser().getId().equals(userId));
                 
         if (!hasPermission) {
-            throw new SharePermissionDeniedException();
+            return Optional.empty();
         }
         
-        return share;
+        return Optional.of(share);
     }
 
     public List<FileShare> findSharesByUserId(Long userId) {
@@ -114,11 +144,39 @@ public class FileShareService {
     }
 
     @Transactional
-    public void deleteShare(Long id) {
+    public void deleteShare(Long id, Long userId) {
+        Optional<FileShare> shareOpt = findById(id);
+        if (shareOpt.isEmpty()) {
+            throw new InvalidShareException();
+        }
+
+        FileShare share = shareOpt.get();
+        
+        if (!share.getOwner().getId().equals(userId) && 
+            !share.getFile().getUserId().equals(userId)) {
+            throw new SharePermissionDeniedException();
+        }
+
         fileShareRepository.deleteById(id);
     }
 
     public List<FileShare> findByFileId(Long fileId) {
         return fileShareRepository.findByFileId_Id(fileId);
+    }
+
+    public boolean hasSharePermission(Long shareId, Long userId) {
+        FileShare share = fileShareRepository.findById(shareId)
+            .orElseThrow(() -> new InvalidShareException("Compartilhamento não encontrado"));
+
+        if (share.isPublico() && !share.isExpired()) {
+            return true;
+        }
+
+        if (share.getOwner().getId().equals(userId)) {
+            return true;
+        }
+
+        return share.getPermissions().stream()
+            .anyMatch(permission -> permission.getUser().getId().equals(userId));
     }
 }

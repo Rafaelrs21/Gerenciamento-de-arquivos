@@ -7,20 +7,16 @@ import lombok.NoArgsConstructor;
 import java.time.Instant;
 import java.util.List;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateFileShareDTO {
-    @NotBlank
+    @NotNull
     private Long fileId;
-    @NotBlank
-    private Long ownerId;
-    private List<Long> userIds;
-    private boolean canEdit;
-    private boolean canShare;
-    private boolean isPublic;
-    private boolean isTemporary;
+    private List<SharePermissionDTO> permissions;
+    private boolean publico;
+    private boolean temporario;
     private Instant expiresAt;
 } 

@@ -5,8 +5,9 @@ CREATE TABLE file_shares (
     owner_id SERIAL,
     file_id SERIAL,
     share_seed VARCHAR(8),
-    is_public BOOLEAN DEFAULT FALSE,
-    is_temporary BOOLEAN DEFAULT FALSE,
+    publico BOOLEAN DEFAULT FALSE,
+    temporario BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES users(id),
-    FOREIGN KEY (file_id) REFERENCES files(id)
+    FOREIGN KEY (file_id) REFERENCES files(id),
+    CONSTRAINT unique_active_file_share UNIQUE (file_id, owner_id)
 ); 

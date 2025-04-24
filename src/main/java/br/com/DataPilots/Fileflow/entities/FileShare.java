@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(name="file_shares")
@@ -35,18 +36,18 @@ public class FileShare {
     private File file;
 
     private String shareSeed;
-    private boolean isPublic;
-    private boolean isTemporary;
+    
+    private boolean publico;
+    
+    private boolean temporario;
 
-    @OneToMany(mappedBy = "fileShare", cascade = CascadeType.ALL)
-    private List<FileSharePermission> permissions;
+    @OneToMany(mappedBy = "fileShare", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<FileSharePermission> permissions = new ArrayList<>();
 
     @PrePersist
     public void prePersist() { 
         createdAt = Instant.now();
-        if (shareSeed == null) {
-            shareSeed = ShareTokenGenerator.generateSeed();
-        }
+        shareSeed = ShareTokenGenerator.generateSeed();
     }
 
     public boolean isExpired() {
@@ -54,6 +55,18 @@ public class FileShare {
     }
 
     public String getPublicToken() {
+        if (!publico) {
+            return null;
+        }
         return ShareTokenGenerator.generateToken(shareSeed);
+    }
+
+    // Getters e setters especiais para o campo publico devido à palavra reservada
+    public boolean isPublic() {
+        return publico;
+    }
+
+    public void setPublic(boolean publico) {
+        this.publico = publico;
     }
 }

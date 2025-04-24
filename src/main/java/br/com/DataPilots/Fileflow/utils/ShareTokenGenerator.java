@@ -13,19 +13,30 @@ public class ShareTokenGenerator {
     }
     
     public static String generateToken(String seed) {
+        if (seed == null || seed.isEmpty()) {
+            throw new IllegalArgumentException("Seed não pode ser nulo ou vazio");
+        }
+        
         try {
             String input = seed + SALT;
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hash = md.digest(input.getBytes());
             
-            String token = Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
-            return token.substring(0, 32); 
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash).substring(0, 32);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Erro ao gerar token", e);
         }
     }
     
     public static boolean validateToken(String seed, String token) {
-        return generateToken(seed).equals(token);
+        if (seed == null || token == null) {
+            return false;
+        }
+        try {
+            String generatedToken = generateToken(seed);
+            return generatedToken.equals(token);
+        } catch (Exception e) {
+            return false;
+        }
     }
 } 

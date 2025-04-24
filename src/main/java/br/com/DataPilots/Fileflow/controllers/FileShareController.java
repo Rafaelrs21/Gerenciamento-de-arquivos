@@ -1,13 +1,18 @@
 package br.com.DataPilots.Fileflow.controllers;
 
 import br.com.DataPilots.Fileflow.dtos.CreateFileShareDTO;
+import br.com.DataPilots.Fileflow.dtos.FileShareResponseDTO;
 import br.com.DataPilots.Fileflow.entities.FileShare;
+import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.services.FileShareService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/share")
@@ -16,44 +21,54 @@ public class FileShareController {
     private final FileShareService fileShareService;
 
     @PostMapping
-    public ResponseEntity<FileShare> createShare(@RequestBody CreateFileShareDTO dto) {
-        return ResponseEntity.ok(fileShareService.createShare(dto));
+    public ResponseEntity<FileShareResponseDTO> createShare(
+            @AuthenticationPrincipal User user,
+            @RequestBody CreateFileShareDTO dto) {
+        FileShare share = fileShareService.createShare(dto, user.getId());
+        return ResponseEntity.ok(FileShareResponseDTO.fromFileShare(share));
     }
 
     @GetMapping("/{shareId}")
-    public ResponseEntity<FileShare> getFileShareById(
-            @PathVariable Long shareId,
-            @RequestParam(required = false) Long userId) {
-        
-        if (userId != null) {
-            return ResponseEntity.ok(fileShareService.findByIdAndUser(shareId, userId));
-        } else {
-            FileShare share = fileShareService.findById(shareId);
-            if (!share.isPublic()) {
-                return ResponseEntity.notFound().build();
-            }
-            return ResponseEntity.ok(share);
-        }
+    public ResponseEntity<FileShareResponseDTO> getFileShareById(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long shareId) {
+        return fileShareService.findByIdAndUser(shareId, user.getId())
+                .map(FileShareResponseDTO::fromFileShare)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/public/{token}")
-    public ResponseEntity<FileShare> getFileShareByPublicToken(@PathVariable String token) {
-        return ResponseEntity.ok(fileShareService.findByPublicToken(token));
+    public ResponseEntity<FileShareResponseDTO> getFileShareByPublicToken(@PathVariable String token) {
+        return fileShareService.findByPublicToken(token)
+                .map(FileShareResponseDTO::fromFileShare)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<FileShare>> getSharesByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(fileShareService.findSharesByUserId(userId));
+    @GetMapping("/shared-with-me")
+    public ResponseEntity<List<FileShareResponseDTO>> getSharesByUser(@AuthenticationPrincipal User user) {
+        List<FileShare> shares = fileShareService.findSharesByUserId(user.getId());
+        List<FileShareResponseDTO> response = shares.stream()
+            .map(FileShareResponseDTO::fromFileShare)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/created/{userId}")
-    public ResponseEntity<List<FileShare>> getSharesCreatedByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(fileShareService.findSharesCreatedByUser(userId));
+    @GetMapping("/my-shares")
+    public ResponseEntity<List<FileShareResponseDTO>> getSharesCreatedByUser(@AuthenticationPrincipal User user) {
+        List<FileShare> shares = fileShareService.findSharesCreatedByUser(user.getId());
+        List<FileShareResponseDTO> response = shares.stream()
+            .map(FileShareResponseDTO::fromFileShare)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{shareId}")
-    public ResponseEntity<Void> deleteShare(@PathVariable Long shareId) {
-        fileShareService.deleteShare(shareId);
+    public ResponseEntity<Void> deleteShare(
+            @AuthenticationPrincipal User user,
+            @PathVariable Long shareId) {
+        fileShareService.deleteShare(shareId, user.getId());
         return ResponseEntity.ok().build();
     }
 }
