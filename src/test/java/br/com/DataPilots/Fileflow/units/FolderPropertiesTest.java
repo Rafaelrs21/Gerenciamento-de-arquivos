@@ -17,19 +17,19 @@ public class FolderPropertiesTest {
     @Property
     void serializeReturnsCorrectMapping(
         @ForAll @LongRange(min = 0) Long id,
-        @ForAll @LongRange(min = 0) Long folderId,
+        @ForAll @LongRange(min = 0) Long userId,
         @ForAll @AlphaChars String name
     ) {
         Folder folder = new Folder();
         folder.setId(id);
-        folder.setFolderId(folderId);
+        folder.setUserId(userId);
         folder.setName(name);
 
         Map<String, Object> serialized = folder.serialize();
 
         assertThat(serialized).hasSize(3);
         assertThat(serialized.get("id")).isEqualTo(id);
-        assertThat(serialized.get("folderId")).isEqualTo(folderId);
+        assertThat(serialized.get("userId")).isEqualTo(userId);
         assertThat(serialized.get("name")).isEqualTo(name);
     }
 }

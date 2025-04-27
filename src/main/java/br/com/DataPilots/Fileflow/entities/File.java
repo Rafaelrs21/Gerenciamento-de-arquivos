@@ -25,7 +25,6 @@ public class File {
     private Long userId;
     private Long folderId;
 
-
     public Map<String, Object> serialize() {
         Map<String, Object> data = new HashMap<>();
         data.put("id", id);
