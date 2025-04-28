@@ -26,7 +26,7 @@ public class Factory {
     public static Folder createFolder() {
         Folder folder = new Folder();
         folder.setName("Folder");
-        folder.setFolderId(1L);
+        folder.setUserId(1L);
         return folder;
     }
 
