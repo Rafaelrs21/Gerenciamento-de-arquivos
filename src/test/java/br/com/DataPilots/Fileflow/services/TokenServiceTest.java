@@ -1,9 +1,6 @@
 package br.com.DataPilots.Fileflow.services;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
@@ -68,5 +65,15 @@ public class TokenServiceTest {
             () -> tokenService.decodeToken(invalidToken)
         );
         assertEquals("Token inválido ou expirado.", exception.getMessage());
+    }
+
+    @Test
+    public void testGenerateToken() throws Exception {
+        String token1 = tokenService.generateUniqueToken();
+        String token2 = tokenService.generateUniqueToken();
+
+        assertNotNull(token1);
+        assertNotNull(token2);
+        assertNotEquals(token1, token2);
     }
 }

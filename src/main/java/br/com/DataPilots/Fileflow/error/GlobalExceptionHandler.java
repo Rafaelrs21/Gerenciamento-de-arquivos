@@ -44,13 +44,6 @@ public class GlobalExceptionHandler {
             .body(exception.getMessage());
     }
 
-    @ExceptionHandler({InvalidPasswordLengthException.class})
-    public ResponseEntity<Object> handleInvalidPasswordLengthExection(InvalidPasswordLengthException exception) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(exception.getMessage());
-    }
-
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<Object> handleInvalidBodyException(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
@@ -61,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({InvalidTokenException.class})
-    public ResponseEntity<Object> handleInvalidPasswordLengthExection(InvalidTokenException exception) {
+    public ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException exception) {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
             .body(exception.getMessage());
@@ -80,7 +73,7 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<DefaultErrorResponse> unknownMethodHandler(Exception ignored) {
+    public ResponseEntity<DefaultErrorResponse> unknownMethodHandler() {
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
             .body(new DefaultErrorResponse("Esse método não é permitido."));
     }
