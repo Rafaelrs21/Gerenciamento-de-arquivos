@@ -15,6 +15,13 @@ public class Factory {
         return new User(username, password);
     }
 
+    public static File createFile() {
+        File file = new File();
+        file.setName("File");
+        file.setId(1L);
+        return file;
+    }
+
     public static User createFakeUser() {
         return Instancio.of(User.class)
             .set(Select.field(User::getId), null)
