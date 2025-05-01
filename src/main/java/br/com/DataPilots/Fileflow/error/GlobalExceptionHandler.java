@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<Object> handleInvalidBodyException(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
+
         exception.getBindingResult().getFieldErrors().forEach(error ->
             errors.put(error.getField(), error.getDefaultMessage())
         );

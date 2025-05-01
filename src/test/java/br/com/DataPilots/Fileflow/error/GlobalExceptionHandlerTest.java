@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -47,7 +48,11 @@ public class GlobalExceptionHandlerTest {
 
     @Test
     public void test_handleInvalidBodyException() {
-        var response = handler.handleInvalidBodyException(Mockito.mock(MethodArgumentNotValidException.class));
+        var exception = Mockito.mock(MethodArgumentNotValidException.class);
+
+        Mockito.when(exception.getBindingResult()).thenReturn(Mockito.mock(BindingResult.class));
+
+        var response = handler.handleInvalidBodyException(exception);
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode().value());
     }
