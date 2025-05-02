@@ -3,6 +3,7 @@ package br.com.DataPilots.Fileflow.services;
 import br.com.DataPilots.Fileflow.entities.File;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
 import br.com.DataPilots.Fileflow.repositories.FileRepository;
+import br.com.DataPilots.Fileflow.repositories.FileVersionRepository;
 import br.com.DataPilots.Fileflow.tests.Factory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,12 +15,14 @@ import java.util.Optional;
 
 public class FileServiceTest {
     private FileRepository repository;
+    private FileVersionRepository fileVersionRepository;
     private FileService fileService;
 
     @BeforeEach
     public void setUp() {
         repository = Mockito.mock(FileRepository.class);
-        fileService = new FileService(repository);
+        fileVersionRepository = Mockito.mock(FileVersionRepository.class);
+        fileService = new FileService(repository, fileVersionRepository);
     }
 
     @Test

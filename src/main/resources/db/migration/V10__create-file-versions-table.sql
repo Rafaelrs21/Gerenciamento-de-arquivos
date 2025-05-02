@@ -1,5 +1,5 @@
 CREATE TABLE file_versions (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     file_id BIGINT NOT NULL,
     version_number INT NOT NULL,
     name VARCHAR(255) NOT NULL,
