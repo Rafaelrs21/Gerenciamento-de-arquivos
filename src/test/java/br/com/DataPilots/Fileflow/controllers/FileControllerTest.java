@@ -2,6 +2,7 @@ package br.com.DataPilots.Fileflow.controllers;
 
 import br.com.DataPilots.Fileflow.dtos.DefaultResponseDTO;
 import br.com.DataPilots.Fileflow.entities.File;
+import br.com.DataPilots.Fileflow.entities.FileVersion;
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFileException;
 import br.com.DataPilots.Fileflow.services.FileService;
@@ -168,5 +169,42 @@ public class FileControllerTest {
 
         assertEquals(400, response.getStatusCode().value());
         assertEquals("Você não tem permissão para excluir este arquivo.", response.getBody().message());
+    }
+
+    @Test
+    public void updateFile() {
+        User user = Mockito.mock(User.class);
+        File file = Mockito.mock(File.class);
+        FileVersion version = Mockito.mock(FileVersion.class);
+        Long fileId = 1010L;
+
+        Mockito.when(version.getId()).thenReturn(1L);
+        Mockito.when(version.getVersionNumber()).thenReturn(10);
+        Mockito.when(fileService.updateFile(file, user.getId())).thenReturn(version);
+
+        var response = fileController.updateFile(user, fileId, file);
+
+        Mockito.verify(file).setId(fileId);
+        Mockito.verify(fileService).updateFile(file, user.getId());
+        assertEquals(200, response.getStatusCode().value());
+        var body = response.getBody();
+        assertEquals(body.get("message"), "Arquivo atualizado com versionamento automático.");
+        assertEquals(body.get("versionId"), version.getId());
+        assertEquals(body.get("versionNumber"), version.getVersionNumber());
+    }
+
+    @Test
+    public void updateFile_whenSomeException() {
+        User user = Mockito.mock(User.class);
+        File file = Mockito.mock(File.class);
+        Long fileId = 1010L;
+
+        Mockito.when(fileService.updateFile(file, user.getId())).thenThrow(new RuntimeException("Arquivo não encontrado"));
+
+        var response = fileController.updateFile(user, fileId, file);
+        assertEquals(400, response.getStatusCode().value());
+        var body = response.getBody();
+        assertEquals(body.get("error"), "Arquivo não encontrado");
+
     }
 }
