@@ -1,5 +1,6 @@
 package br.com.DataPilots.Fileflow.error;
 
+import br.com.DataPilots.Fileflow.exceptions.FolderAlreadyExistsException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidPasswordLengthException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidTokenException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidUserException;
@@ -58,6 +59,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException exception) {
         return ResponseEntity
             .status(HttpStatus.UNAUTHORIZED)
+            .body(exception.getMessage());
+    }
+
+    @ExceptionHandler({FolderAlreadyExistsException.class})
+    public ResponseEntity<Object> FolderAlreadyExists(FolderAlreadyExistsException exception) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(exception.getMessage());
     }
 

@@ -1,7 +1,7 @@
 package br.com.DataPilots.Fileflow.services;
 
 
-import br.com.DataPilots.Fileflow.entities.File;
+import br.com.DataPilots.Fileflow.dtos.FolderDTO;
 import br.com.DataPilots.Fileflow.entities.Folder;
 import br.com.DataPilots.Fileflow.exceptions.FolderAlreadyExistsException;
 import br.com.DataPilots.Fileflow.exceptions.FolderNotFoundException;
@@ -9,10 +9,8 @@ import br.com.DataPilots.Fileflow.exceptions.InvalidFolderException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFolderPermissionException;
 import br.com.DataPilots.Fileflow.repositories.FolderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Service
@@ -21,11 +19,16 @@ public class FolderService {
 
     private final FolderRepository repository;
 
-    public void create(Long userId, String folderName) {
+    public List<FolderDTO> getFolders(Long userId) {
+        List<Folder> folders = repository.findFoldersByUserId(userId);
+        return folders.stream().map(folder -> new FolderDTO(folder.getId(), folder.getName())).toList();
+    }
+
+    public Folder create(Long userId, String folderName) {
         this.checkParams(folderName, userId);
 
         Folder folder = new Folder(null, userId, folderName);
-        this.repository.save(folder);
+        return this.repository.save(folder);
     }
 
     public void delete(Long userId, Long folderId) {
