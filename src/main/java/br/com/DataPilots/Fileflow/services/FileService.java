@@ -17,12 +17,12 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-    public class FileService {
+public class FileService {
 
-        private final FileRepository repository;
-        private final FileVersionRepository fileVersionRepository;
+    private final FileRepository repository;
+    private final FileVersionRepository fileVersionRepository;
 
-        public void create(String name, String mimeType, String base64, Long userId, Long folderId) throws InvalidFileException {
+    public void create(String name, String mimeType, String base64, Long userId, Long folderId) throws InvalidFileException {
         this.checkParams(name,userId, folderId, base64);
 
         byte[] decodedBytes = Base64.getDecoder().decode(base64);

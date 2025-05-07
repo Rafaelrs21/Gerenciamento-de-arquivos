@@ -40,7 +40,6 @@ public class FolderController {
             this.folderService.delete(user.getId(), folderId);
             return this.folderDeletedResponse();
         } catch (Exception exception) {
-            System.out.println(exception.getMessage());
             return this.badRequestResponse(exception.getMessage());
         }
     }

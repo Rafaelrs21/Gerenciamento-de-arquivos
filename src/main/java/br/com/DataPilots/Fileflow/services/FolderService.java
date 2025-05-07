@@ -9,10 +9,8 @@ import br.com.DataPilots.Fileflow.exceptions.InvalidFolderException;
 import br.com.DataPilots.Fileflow.exceptions.InvalidFolderPermissionException;
 import br.com.DataPilots.Fileflow.repositories.FolderRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Service
