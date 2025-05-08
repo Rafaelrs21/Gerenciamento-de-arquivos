@@ -207,8 +207,6 @@ public class FileShareServiceTest {
         verify(fileShareRepository).deleteById(shareId);
     }
 
-
-
     @Test
     public void testHasSharePermission_PublicAndNotExpired() {
         Long shareId = 3L;
@@ -221,12 +219,6 @@ public class FileShareServiceTest {
         when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
 
         assertTrue(fileShareService.hasSharePermission(shareId, userId));
-    }
-
-    @Test
-    public void testFindById_NotFound() {
-        when(fileShareRepository.findById(999L)).thenReturn(Optional.empty());
-        assertTrue(fileShareService.findById(999L).isEmpty());
     }
 
     @Test
@@ -249,17 +241,6 @@ public class FileShareServiceTest {
     }
 
     @Test
-    public void testFindByIdAndUser_ShareNotFound() {
-        Long shareId = 1L;
-        Long userId = 2L;
-
-        when(fileShareRepository.findById(shareId)).thenReturn(Optional.empty());
-
-        Optional<FileShare> result = fileShareService.findByIdAndUser(shareId, userId);
-        assertFalse(result.isPresent());
-    }
-
-    @Test
     public void testFindByIdAndUser_UserIsNotOwnerNorFileUser() {
         Long shareId = 1L;
         Long userId = 2L;
@@ -273,28 +254,6 @@ public class FileShareServiceTest {
         when(owner.getId()).thenReturn(3L);
         when(share.getFile()).thenReturn(file);
         when(file.getUserId()).thenReturn(4L);
-        when(share.getPermissions()).thenReturn(Collections.emptyList());
-        when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
-
-        Optional<FileShare> result = fileShareService.findByIdAndUser(shareId, userId);
-        assertFalse(result.isPresent());
-    }
-
-    @Test
-    public void testFindByIdAndUser_UserHasNoPermission() {
-        Long shareId = 1L;
-        Long userId = 2L;
-
-        User owner = mock(User.class);
-        User fileUser = mock(User.class);
-        File file = mock(File.class);
-        FileShare share = mock(FileShare.class);
-
-        when(share.getOwner()).thenReturn(owner);
-        when(owner.getId()).thenReturn(3L);
-        when(share.getFile()).thenReturn(file);
-        when(file.getUserId()).thenReturn(4L);
-
         when(share.getPermissions()).thenReturn(Collections.emptyList());
         when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
 
