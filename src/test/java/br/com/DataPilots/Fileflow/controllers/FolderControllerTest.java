@@ -2,6 +2,7 @@ package br.com.DataPilots.Fileflow.controllers;
 
 import br.com.DataPilots.Fileflow.dtos.CreateFolderRequestDTO;
 import br.com.DataPilots.Fileflow.entities.File;
+import br.com.DataPilots.Fileflow.entities.Folder;
 import br.com.DataPilots.Fileflow.entities.User;
 import br.com.DataPilots.Fileflow.services.FileService;
 import br.com.DataPilots.Fileflow.services.FolderService;
@@ -10,10 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,13 +33,18 @@ public class FolderControllerTest {
     public void createFolder() {
         String folderName = "testFolder";
         User user = Mockito.mock(User.class);
+        Folder folder = Mockito.mock(Folder.class);
         CreateFolderRequestDTO body = new CreateFolderRequestDTO(folderName);
 
         Mockito.when(user.getId()).thenReturn(1L);
+        Mockito.when(folder.getId()).thenReturn(2L);
+        Mockito.when(folder.getName()).thenReturn(folderName);
+        Mockito.when(folderService.create(1L, folderName)).thenReturn(folder);
 
         var response = folderController.createFolder(user, body);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("Pasta criada.", response.getBody().message());
+        assertEquals(folderName, response.getBody().name());
+        assertEquals(2L, response.getBody().id());
         Mockito.verify(folderService).create(user.getId(), folderName);
     }
 
@@ -54,9 +57,8 @@ public class FolderControllerTest {
         Mockito.when(user.getId()).thenReturn(1L);
         Mockito.doThrow(new RuntimeException("Ocorreu um erro")).when(folderService).create(1L, folderName);
 
-        var response = folderController.createFolder(user, body);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Ocorreu um erro", response.getBody().message());
+        Exception exception = assertThrows(Exception.class, () -> folderController.createFolder(user, body));
+        assertEquals("A pasta já existe.", exception.getMessage());
     }
 
     @Test
@@ -94,7 +96,9 @@ public class FolderControllerTest {
         File file = Mockito.mock(File.class);
         files.add(file);
 
-        Map<String, Object> data = Map.of("teste1", "teste2");
+        Map<String, Object> data = new HashMap<>();
+        data.put("teste1", "teste2");
+        data.put("base64", "data");
         Mockito.when(file.serialize()).thenReturn(data);
         Mockito.when(user.getId()).thenReturn(1L);
         Mockito.when(fileService.getFilesByFolder(1L, folderId)).thenReturn(files);
