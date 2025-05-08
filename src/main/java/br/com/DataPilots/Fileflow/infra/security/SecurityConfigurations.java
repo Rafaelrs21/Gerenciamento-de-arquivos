@@ -30,15 +30,6 @@ public class SecurityConfigurations {
         http.csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sessionManagement -> {
                 sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-            }).cors(cors -> {
-                cors.configurationSource(request -> {
-                    var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfig.addAllowedOrigin("http://localhost:5173");
-                    corsConfig.addAllowedMethod("*");
-                    corsConfig.addAllowedHeader("*");
-                    corsConfig.setAllowCredentials(true);
-                    return corsConfig;
-                });
             })
             .authorizeHttpRequests(request -> {
                 request.requestMatchers(HttpMethod.POST, "/login").permitAll();

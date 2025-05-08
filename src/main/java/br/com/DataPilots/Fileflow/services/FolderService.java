@@ -1,7 +1,7 @@
 package br.com.DataPilots.Fileflow.services;
 
 
-import br.com.DataPilots.Fileflow.dtos.FolderDTO;
+import br.com.DataPilots.Fileflow.entities.File;
 import br.com.DataPilots.Fileflow.entities.Folder;
 import br.com.DataPilots.Fileflow.exceptions.FolderAlreadyExistsException;
 import br.com.DataPilots.Fileflow.exceptions.FolderNotFoundException;
@@ -19,16 +19,11 @@ public class FolderService {
 
     private final FolderRepository repository;
 
-    public List<FolderDTO> getFolders(Long userId) {
-        List<Folder> folders = repository.findFoldersByUserId(userId);
-        return folders.stream().map(folder -> new FolderDTO(folder.getId(), folder.getName())).toList();
-    }
-
-    public Folder create(Long userId, String folderName) {
+    public void create(Long userId, String folderName) {
         this.checkParams(folderName, userId);
 
         Folder folder = new Folder(null, userId, folderName);
-        return this.repository.save(folder);
+        this.repository.save(folder);
     }
 
     public void delete(Long userId, Long folderId) {
