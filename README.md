@@ -11,13 +11,20 @@ O **Gerenciamento de Documentos** é um sistema desenvolvido para facilitar a or
 
 ---
 
+## 📚 Documentação
+
+- [Relatório do Projeto](docs/projeto.md)
+
 ## 👥 Colaboradores
 - [Iasmim Silveira](https://github.com/iasmimsilveira)
 - [Rafael Santiago](https://github.com/Rafaelrs21)
 - [Breno Lobato](https://github.com/kick250)
 - [Lucio Caetano](https://github.com/caetanoinf)
 - [Gabriel Fonseca](https://github.com/gabrielborel)
+- [Tao Hansen](https://github.com/taohansens)
+- [Miguel Wiest](https://github.com/miguelwiest)
 ---
+<<<<<<< HEAD
 
 # Como Rodar o Projeto
 
@@ -130,3 +137,4 @@ Se a migração for bem-sucedida, a tabela será criada no banco de dados automa
 
 ---
 Se tiver dúvidas, entre em contato com a equipe! 🚀
+=======
