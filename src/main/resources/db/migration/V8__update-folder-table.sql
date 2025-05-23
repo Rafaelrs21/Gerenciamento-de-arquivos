@@ -1,0 +1,2 @@
+ALTER TABLE folders DROP COLUMN folder_id;
+ALTER TABLE folders ADD COLUMN user_id SERIAL;

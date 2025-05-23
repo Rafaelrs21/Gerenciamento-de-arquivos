@@ -1,0 +1,22 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: file-flow-app-container
+        networks:
+            - file-flow-network
+        ports:
+            - "8080:8080"
+        environment:
+            SPRING_PROFILES_ACTIVE: dev
+            DB_HOST: database
+            DB_PORT: 5432
+            DB_NAME: file_flow
+            DB_USER: postgres
+            DB_PASS: admin
+            FILE_FLOW_JWT_SECRET: 12345678
+
+networks:
+    file-flow-network:
+        external: true

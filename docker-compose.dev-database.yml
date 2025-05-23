@@ -1,0 +1,17 @@
+version: '3'
+services:
+  database:
+    image: postgres
+    container_name: file-flow-database-container
+    restart: always
+    networks:
+      - development-network
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: file_flow
+
+networks:
+  development-network:
+    driver: bridge

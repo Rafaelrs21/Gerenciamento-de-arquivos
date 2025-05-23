@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres
+    container_name: file-flow-test-database
+    restart: always
+    networks:
+      - default-network
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: file_flow_test
+
+  app:
+    build:
+      dockerfile: ./tests.dockerfile
+      context: .
+    depends_on:
+      - database
+    networks:
+      - default-network
+
+networks:
+  default-network:
+    driver: bridge

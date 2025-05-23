@@ -1,0 +1,27 @@
+environment: "development"
+spring:
+    config:
+        activate:
+            on-profile: dev
+    application:
+        name: "Fileflow"
+        security:
+            token:
+                secret: ${FILE_FLOW_JWT_SECRET:12345678}
+    datasource:
+        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:file_flow}
+        username: ${DB_USER:postgres}
+        password: ${DB_PASS:admin}
+    jpa:
+        properties:
+            hibernate:
+                show_sql: true
+                format_sql: true
+                ddl-auto: none
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+integrations:
+    ses:
+        aws_region: "us-east-1"
+        sender_email: "fulano@de.tal.com.br"
+        access_key: "111111"
+        secret_key: "111111"
