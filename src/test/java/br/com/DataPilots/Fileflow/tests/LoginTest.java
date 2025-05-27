@@ -8,13 +8,14 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.Alert;
 import java.time.Duration;
+import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class LoginTest extends BaseSeleniumTest {
 
     @Test
     @DisabledIf("servicesNotRunning")
-    public void testRegistroELoginCompleto() {
+    public void testRegistroELoginCompleto() throws Exception {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         
         // 1. Navega para a página de login
@@ -87,7 +88,7 @@ public class LoginTest extends BaseSeleniumTest {
         wait.until(ExpectedConditions.urlContains("/login"));
         assertTrue(driver.getCurrentUrl().contains("/login"));
         
-        System.out.println("✅ Teste completo: Registro → Login → Logout realizado com sucesso!");
+        System.out.println("Teste completo: Registro → Login → Logout realizado com sucesso!");
     }
 
     @Test
@@ -95,7 +96,7 @@ public class LoginTest extends BaseSeleniumTest {
     public void testLoginComCredenciaisInvalidas_TesteIndependente() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         
-        System.out.println("🔄 Iniciando teste independente de login com credenciais inválidas...");
+        System.out.println("Iniciando teste independente de login com credenciais inválidas...");
         
         // Navega para a página de login
         driver.get(FRONTEND_URL + "/login");
@@ -129,7 +130,7 @@ public class LoginTest extends BaseSeleniumTest {
             assertTrue(driver.getCurrentUrl().contains("/login"));
         }
         
-        System.out.println("✅ Teste de login inválido concluído!");
+        System.out.println("Teste de login inválido concluído!");
     }
 
     @Test
@@ -137,7 +138,7 @@ public class LoginTest extends BaseSeleniumTest {
     public void testRegistroComSenhasDiferentes() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         
-        System.out.println("🔄 Iniciando teste de registro com senhas diferentes...");
+        System.out.println("Iniciando teste de registro com senhas diferentes...");
         
         // Navega para a página de login
         driver.get(FRONTEND_URL + "/login");
@@ -192,7 +193,7 @@ public class LoginTest extends BaseSeleniumTest {
             System.out.println("Permaneceu na página de registro (sem alerta)");
         }
         
-        System.out.println("✅ Teste de registro com senhas diferentes concluído!");
+        System.out.println("Teste de registro com senhas diferentes concluído!");
     }
 
     @Test
@@ -200,7 +201,7 @@ public class LoginTest extends BaseSeleniumTest {
     public void testLoginIncorreto() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         
-        System.out.println("🔄 Iniciando teste de login com credenciais incorretas...");
+        System.out.println("Iniciando teste de login com credenciais incorretas...");
         
         // Navega para a página de login
         driver.get(FRONTEND_URL + "/login");
@@ -235,7 +236,7 @@ public class LoginTest extends BaseSeleniumTest {
             System.out.println("Permaneceu na página de login (sem alerta)");
         }
         
-        System.out.println("✅ Teste de login incorreto concluído!");
+        System.out.println("Teste de login incorreto concluído!");
     }
 
     // Método auxiliar para verificar se os serviços NÃO estão rodando

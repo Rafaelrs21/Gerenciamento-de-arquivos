@@ -54,14 +54,14 @@ public abstract class BaseSeleniumTest {
     public static void setUp() {
         // Verifica se os serviços estão rodando antes de configurar o WebDriver
         if (!areServicesRunning()) {
-            System.out.println("⚠️  Serviços não estão rodando. Testes serão pulados.");
+            System.out.println("Serviços não estão rodando. Testes serão pulados.");
             System.out.println("   Para executar os testes:");
             System.out.println("   1. Inicie o backend na porta 8080");
             System.out.println("   2. Inicie o frontend na porta 5173");
             return;
         }
 
-        System.out.println("✅ Serviços detectados. Configurando WebDriver...");
+        System.out.println("Serviços detectados. Configurando WebDriver...");
         
         // Configura o WebDriverManager para Chrome
         WebDriverManager.chromedriver().setup();
@@ -78,15 +78,15 @@ public abstract class BaseSeleniumTest {
         
         System.out.println("Frontend URL: " + FRONTEND_URL);
         System.out.println("Backend URL: " + BACKEND_URL);
-        System.out.println("✅ WebDriver configurado com sucesso!");
+        System.out.println("WebDriver configurado com sucesso!");
     }
 
     @AfterAll
     public static void tearDown() {
         if (driver != null) {
-            System.out.println("🔄 Fechando WebDriver...");
+            System.out.println("Fechando WebDriver...");
             driver.quit();
-            System.out.println("✅ WebDriver fechado.");
+            System.out.println("WebDriver fechado.");
         }
     }
 } 
