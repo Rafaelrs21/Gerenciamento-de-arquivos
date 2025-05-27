@@ -71,8 +71,7 @@ public abstract class BaseSeleniumTest {
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--remote-allow-origins=*");
         options.addArguments("--window-size=1920,1080");
-        // Remova esta linha se quiser ver o browser funcionando:
-        // options.addArguments("--headless");
+        options.addArguments("--headless");
         
         driver = new ChromeDriver(options);
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
