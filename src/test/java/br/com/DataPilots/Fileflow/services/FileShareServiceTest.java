@@ -240,11 +240,10 @@ public class FileShareServiceTest {
         Long userId = 1L;
 
         FileShare share = mock(FileShare.class);
-
         when(share.isPublico()).thenReturn(true);
         when(share.isExpired()).thenReturn(false);
-        when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
 
+        when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
         assertTrue(fileShareService.hasSharePermission(shareId, userId));
     }
 
@@ -269,9 +268,7 @@ public class FileShareServiceTest {
         when(share.getPermissions()).thenReturn(List.of(permission));
 
         when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
-
         boolean resultado = fileShareService.hasSharePermission(shareId, userId);
-
         assertTrue(resultado);
     }
 
@@ -288,33 +285,22 @@ public class FileShareServiceTest {
         when(fileShare.getId()).thenReturn(1L);
 
         when(fileShareRepository.findAllPublicAndNotExpired()).thenReturn(List.of(fileShare));
-
         Optional<FileShare> result = fileShareService.findByPublicToken(token);
-
         assertTrue(result.isPresent());
         assertEquals(1L, result.get().getId());
     }
 
     @Test
     public void testFindByPublicToken_quandoRepositorioLancaExcecao() {
-        // given ---------------------------------------------------------------
         String token = "qualquerToken";
 
-        // Faz o repositório lançar exceção ao ser chamado
         when(fileShareRepository.findAllPublicAndNotExpired())
             .thenThrow(new RuntimeException("Falha simulada"));
 
-        // when ---------------------------------------------------------------
         Optional<FileShare> resultado = fileShareService.findByPublicToken(token);
-
-        // then ---------------------------------------------------------------
-        assertTrue(resultado.isEmpty(),
-            "Quando ocorre exceção, o método deve retornar Optional.empty()");
-        verify(fileShareRepository).findAllPublicAndNotExpired();  // foi invocado uma vez
+        assertTrue(resultado.isEmpty());
+        verify(fileShareRepository).findAllPublicAndNotExpired();
     }
-
-
-
 
     @Test
     public void testFindByIdAndUser_UserIsNotOwnerNorFileUser() {
@@ -322,7 +308,6 @@ public class FileShareServiceTest {
         Long userId = 2L;
 
         User owner = mock(User.class);
-        User fileUser = mock(User.class);
         File file = mock(File.class);
         FileShare share = mock(FileShare.class);
 
@@ -330,9 +315,9 @@ public class FileShareServiceTest {
         when(owner.getId()).thenReturn(3L);
         when(share.getFile()).thenReturn(file);
         when(file.getUserId()).thenReturn(4L);
+
         when(share.getPermissions()).thenReturn(Collections.emptyList());
         when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
-
         Optional<FileShare> result = fileShareService.findByIdAndUser(shareId, userId);
         assertFalse(result.isPresent());
     }
@@ -343,9 +328,7 @@ public class FileShareServiceTest {
         Long userId = 2L;
 
         when(fileShareRepository.findById(shareId)).thenReturn(Optional.empty());
-
         Optional<FileShare> resultado = fileShareService.findByIdAndUser(shareId, userId);
-
         assertTrue(resultado.isEmpty());
     }
 
@@ -354,24 +337,21 @@ public class FileShareServiceTest {
         Long shareId = 1L;
         Long userId = 2L;
 
-        // Mock do share e dos relacionamentos
         User owner = mock(User.class);
         File file = mock(File.class);
         FileShare share = mock(FileShare.class);
 
         when(share.getOwner()).thenReturn(owner);
-        when(owner.getId()).thenReturn(3L); // diferente do userId
+        when(owner.getId()).thenReturn(3L);
         when(share.getFile()).thenReturn(file);
-        when(file.getUserId()).thenReturn(4L); // diferente também
+        when(file.getUserId()).thenReturn(4L);
 
         when(share.isPublico()).thenReturn(true);
         when(share.isExpired()).thenReturn(false);
         when(share.getPermissions()).thenReturn(Collections.emptyList());
 
         when(fileShareRepository.findById(shareId)).thenReturn(Optional.of(share));
-
         Optional<FileShare> resultado = fileShareService.findByIdAndUser(shareId, userId);
-
         assertTrue(resultado.isPresent());
     }
 }
