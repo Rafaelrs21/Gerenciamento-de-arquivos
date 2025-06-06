@@ -28,6 +28,9 @@ Antes de começar, certifique-se de ter instalado:
 - [Docker e Docker Compose](https://docs.docker.com/get-docker/)
 - [Java 17+](https://adoptium.net/)
 
+## Front-end do projeto
+- [FileFlow-front](https://github.com/taohansens/FileFlow-front)
+
 ## Configuração inicial
 Antes de rodar o projeto, crie o arquivo de configuração necessário:
 ```sh
