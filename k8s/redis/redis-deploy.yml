@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: redis-deployment
+    namespace: file-flow
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: redis
+    template:
+        metadata:
+            labels:
+                app: redis
+        spec:
+            automountServiceAccountToken: false
+            containers:
+                -   name: redis
+                    image: redis:latest
+                    imagePullPolicy: Always
+            restartPolicy: Always
