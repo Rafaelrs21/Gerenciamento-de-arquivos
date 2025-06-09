@@ -1,5 +1,6 @@
 package br.com.DataPilots.Fileflow.entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Folder {
+public class Folder implements Serializable {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     private Long userId;
