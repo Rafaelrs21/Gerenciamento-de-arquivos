@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: fileflow-deployment
+    namespace: file-flow
+spec:
+    replicas: 4
+    selector:
+        matchLabels:
+            app: fileflow
+    template:
+        metadata:
+            labels:
+                app: fileflow
+        spec:
+            automountServiceAccountToken: false
+            containers:
+                -   name: fileflow
+                    image: taohansens/fileflow-infnet:latest
+                    imagePullPolicy: Always
+                    env:
+                        -   name: APP_PROFILE
+                            value: "k8s"
+                        -   name: DB_HOST
+                            value: "postgres-svc"
+                    envFrom:
+                        -   configMapRef:
+                                name: postgres-config
+            restartPolicy: Always
