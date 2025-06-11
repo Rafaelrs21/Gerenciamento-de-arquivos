@@ -29,6 +29,26 @@
 	<properties>
 		<java.version>17</java.version>
 	</properties>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <properties>
+                <APP_PROFILE>default</APP_PROFILE>
+            </properties>
+        </profile>
+        <profile>
+            <id>k8s</id>
+            <properties>
+                <APP_PROFILE>k8s</APP_PROFILE>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <APP_PROFILE>dev</APP_PROFILE>
+            </properties>
+        </profile>
+    </profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
