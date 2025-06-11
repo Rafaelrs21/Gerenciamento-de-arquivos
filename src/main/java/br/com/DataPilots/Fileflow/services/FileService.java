@@ -30,7 +30,11 @@ public class FileService {
 
         Timestamp now = new Timestamp(System.currentTimeMillis());
         File file = new File(null, name, mimeType, base64, size, now, userId, folderId);
+
         this.repository.save(file);
+
+        FileVersion versionSnapshot = new FileVersion(file, 1);
+        fileVersionRepository.save(versionSnapshot);
     }
 
     public String downloadFile(String name, Long userId, Long folderId) throws InvalidFileException {
