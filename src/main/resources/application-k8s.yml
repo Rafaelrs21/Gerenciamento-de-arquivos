@@ -8,6 +8,12 @@ spring:
         security:
             token:
                 secret: ${FILE_FLOW_JWT_SECRET:12345678}
+    cache:
+        type: redis
+    data:
+        redis:
+            host: ${REDIS_HOST:localhost}
+            port: ${REDIS_PORT:6379}
     datasource:
         url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:file_flow}
         username: ${POSTGRES_USER:postgres}

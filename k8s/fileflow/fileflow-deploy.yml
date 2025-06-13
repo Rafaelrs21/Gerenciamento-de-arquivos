@@ -23,6 +23,8 @@ spec:
                             value: "k8s"
                         -   name: DB_HOST
                             value: "postgres-svc"
+                        -   name: REDIS_HOST
+                            value: "redis-svc"
                     envFrom:
                         -   configMapRef:
                                 name: postgres-config
