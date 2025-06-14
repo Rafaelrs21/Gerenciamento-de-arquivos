@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -25,7 +26,10 @@ public class FileService {
     private final FileRepository repository;
     private final FileVersionRepository fileVersionRepository;
 
-    @CachePut(value = {"get-files-by-folder", "get-files-by-user"}, key = "#userId")
+    @Caching(evict = {
+        @CacheEvict(value = "get-files-by-folder", key = "#userId + '-' + #folderId"),
+        @CacheEvict(value = "get-files-by-user", key = "#userId")
+    })
     public void create(String name, String mimeType, String base64, Long userId, Long folderId) throws InvalidFileException {
         this.checkParams(name,userId, folderId, base64);
 
@@ -61,7 +65,10 @@ public class FileService {
         }
     }
 
-    @CachePut(value = {"get-files-by-folder", "get-files-by-user"}, key = "#userId")
+    @Caching(evict = {
+        @CacheEvict(value = "get-files-by-folder", key = "#userId + '-' + #updatedFile.folderId"),
+        @CacheEvict(value = "get-files-by-user", key = "#userId")
+    })
     @Transactional
     public FileVersion updateFile(File updatedFile, Long userId) {
         File existingFile = repository.findById(updatedFile.getId())
@@ -98,17 +105,20 @@ public class FileService {
         return this.repository.findByNameAndUserIdAndFolderId(name, userId, folderId);
     }
 
-    @Cacheable("get-files-by-folder")
+    @Cacheable(value = "get-files-by-folder", key = "#userId + '-' + #folderId")
     public List<File> getFilesByFolder(Long userId, Long folderId) {
         return this.repository.findByUserIdAndFolderId(userId, folderId);
     }
 
-    @Cacheable("get-files-by-user")
+    @Cacheable(value = "get-files-by-user", key = "#userId")
     public List<File> getFilesByUser(Long userId) {
         return this.repository.findByUserId(userId);
     }
 
-    @CacheEvict(value = {"get-files-by-folder", "get-files-by-user"}, key = "#file.userId")
+    @Caching(evict = {
+        @CacheEvict(value = "get-files-by-folder", key = "#file.userId + '-' + #file.folderId"),
+        @CacheEvict(value = "get-files-by-user", key = "#file.userId")
+    })
     public void delete(File file) {
         this.repository.delete(file);
     }
