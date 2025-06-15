@@ -25,9 +25,23 @@ spec:
                             value: "postgres-svc"
                         -   name: REDIS_HOST
                             value: "redis-svc"
+                        -   name: SERVER_PORT
+                            value: "8080"
+                        # Configurações Graylog
+                        -   name: GRAYLOG_HOST
+                            value: "server.file-flow.svc.cluster.local"
+                        -   name: GRAYLOG_PORT
+                            value: "12201"
+                        -   name: LOGGING_GELF_ENABLED
+                            value: "true"
+                        -   name: LOGGING_LEVEL_COM_YOURAPP
+                            value: "INFO"
                     envFrom:
                         -   configMapRef:
                                 name: postgres-config
                         -   configMapRef:
                                 name: fileflow-config
+                    ports:
+                        -   containerPort: 8080
+                            name: http
             restartPolicy: Always

@@ -18,4 +18,40 @@ spec:
                 -   name: redis
                     image: redis:latest
                     imagePullPolicy: Always
+                    ports:
+                        -   containerPort: 6379
+                            name: redis
+                    command: ["redis-server"]
+                    args: [
+                        "--logfile", "/var/log/redis/redis.log",
+                        "--loglevel", "notice",
+                        "--syslog-enabled", "yes",
+                        "--syslog-ident", "redis",
+                        "--syslog-facility", "local1"
+                    ]
+                    volumeMounts:
+                        -   name: redis-logs
+                            mountPath: /var/log/redis
+                # Sidecar Filebeat para coletar logs do Redis
+                -   name: filebeat-redis
+                    image: docker.elastic.co/beats/filebeat:8.11.0
+                    args: [
+                      "-c", "/etc/filebeat/filebeat.yml",
+                      "-e",
+                    ]
+                    env:
+                    - name: GRAYLOG_HOST
+                      value: "server.file-flow.svc.cluster.local"
+                    volumeMounts:
+                    - name: filebeat-redis-config
+                      mountPath: /etc/filebeat
+                    - name: redis-logs
+                      mountPath: /var/log/redis
+                      readOnly: true
+            volumes:
+                -   name: redis-logs
+                    emptyDir: {}
+                -   name: filebeat-redis-config
+                    configMap:
+                        name: filebeat-redis-config
             restartPolicy: Always

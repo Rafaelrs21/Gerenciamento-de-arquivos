@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-config
+  namespace: file-flow
+data:
+  filebeat.yml: |
+    filebeat.inputs:
+    - type: log
+      enabled: true
+      paths:
+        - /var/log/nginx/access.log
+        - /var/log/nginx/error.log
+      fields:
+        component: nginx
+        service: fileflow-front
+      fields_under_root: true
+      multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+      multiline.negate: true
+      multiline.match: after
+
+    output.logstash:
+      hosts: ["server.file-flow.svc.cluster.local:5044"]
+
+    processors:
+    - add_host_metadata:
+        when.not.contains.tags: forwarded
+    - add_kubernetes_metadata:
+        host: "${NODE_NAME}"
+        matchers:
+        - logs_path:
+            logs_path: "/var/log/containers/"
+
+    logging.level: info
+    logging.to_files: true
+    logging.files:
+      path: /var/log/filebeat
+      name: filebeat
+      keepfiles: 7
+      permissions: 0644 
