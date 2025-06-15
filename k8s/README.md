@@ -2,22 +2,24 @@ Anotações
 
 
 ### Criação de Namespace no kubernetes
-```
+```bash
 kubectl create ns file-flow
 kubectl config set-context --current --namespace=file-flow
 ```
 
 ### Criar
-```
-kubectl apply -f k8s/fileflow
-kubectl apply -f k8s/fileflow-front
+```bash
 kubectl apply -f k8s/postgres
 kubectl apply -f k8s/redis
-kubectl apply -f k8s/graylog
+kubectl apply -f k8s/fluent-bit
+helm install graylog ./k8s/graylog/ -n file-flow
+
+kubectl apply -f k8s/fileflow
+kubectl apply -f k8s/fileflow-front
 ```
 
 ### Remover
-```
+```bash
 kubectl delete -f k8s/fileflow
 kubectl delete -f k8s/fileflow-front
 kubectl delete -f k8s/postgres
@@ -30,51 +32,35 @@ helm uninstall graylog -n file-flow
 minikube -n file-flow service fileflow-front-svc --url
 ```
 
-### Graylog Access
+### Configurar Graylog
+
+Acessar o container graylog e pegar a senha do root
+
+```bash
+Log do graylog com a senha, parecido com isto:
+It seems you are starting Graylog for the first time. To set up a fresh install, a setup interface has
+
+been started. You must log in to it to perform the initial configuration and continue.
+
+
+Initial configuration is accessible at 0.0.0.0:9000, with username 'admin' and password 'moDDJApZpX'.
+
+Try clicking on http://admin:moDDJApZpX@0.0.0.0:9000⁠
 ```
-kubectl port-forward -n file-flow svc/graylog 9000:9000
-```
+
+Acessar site do graylog: http://localhost:30090
+Preencher o organizationName, colocar um periodo e prover certificado para o node.
+
+Após a conclusão(aprox 3min), quando ficar verde clicar em Resume.. sera redirecionado para a tela de login.
+
+logar com admin/admin
+
+
+
 
 
 choco install openssl
 
-## Graylog DataNode: Geração de Certificados e Configuração do Secret
 
-O DataNode do Graylog exige certificados SSL para funcionar corretamente. Como este repositório pode ser clonado e executado em diferentes ambientes, **os certificados não são versionados**. Cada usuário deve gerar os seus próprios certificados e criar um Secret no Kubernetes antes de subir o ambiente.
-
-### 1. Gerando certificados autoassinados
-
-Execute os comandos abaixo para gerar os certificados necessários:
-
-```sh
-# Gere o certificado HTTP
-openssl req -x509 -newkey rsa:4096 -keyout http.key -out http.crt -days 365 -nodes -subj "/CN=graylog-datanode"
-openssl pkcs12 -export -out http.p12 -inkey http.key -in http.crt -password pass:graylog
-
-# Gere o certificado Transport
-openssl req -x509 -newkey rsa:4096 -keyout transport.key -out transport.crt -days 365 -nodes -subj "/CN=graylog-datanode"
-openssl pkcs12 -export -out transport.p12 -inkey transport.key -in transport.crt -password pass:graylog
-```
-
-### 2. Criando o Secret no Kubernetes
-
-Com os arquivos `http.p12` e `transport.p12` gerados, crie o Secret:
-
-```sh
-kubectl create secret generic graylog-datanode-certs --from-file=http.p12 --from-file=transport.p12 -n file-flow
-```
-
-### 3. Subindo o ambiente
-
-Depois de criar o Secret, aplique os manifests normalmente:
-
-```sh
-kubectl apply -f k8s/graylog
-```
-
-- Se precisar remover e recriar o Secret, use:
-  ```sh
-  kubectl delete secret graylog-datanode-certs -n file-flow
-  ```
 
 

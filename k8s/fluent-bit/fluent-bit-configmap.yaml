@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: fluent-bit-config-enhanced
+  name: fluent-bit-config
   namespace: kube-system
   labels:
     k8s-app: fluent-bit

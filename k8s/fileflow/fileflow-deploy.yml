@@ -42,4 +42,35 @@ spec:
                     ports:
                         -   containerPort: 8080
                             name: http
+                # Sidecar Filebeat para coletar logs da aplicação
+                -   name: filebeat
+                    image: docker.elastic.co/beats/filebeat:8.11.0
+                    args: [
+                      "-c", "/etc/filebeat/filebeat.yml",
+                      "-e",
+                    ]
+                    env:
+                    - name: NODE_NAME
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: spec.nodeName
+                    volumeMounts:
+                    - name: filebeat-config
+                      mountPath: /etc/filebeat
+                    - name: varlogcontainers
+                      mountPath: /var/log/containers
+                      readOnly: true
+                    - name: varlogpods
+                      mountPath: /var/log/pods
+                      readOnly: true
+            volumes:
+            - name: filebeat-config
+              configMap:
+                name: filebeat-backend-config
+            - name: varlogcontainers
+              hostPath:
+                path: /var/log/containers
+            - name: varlogpods
+              hostPath:
+                path: /var/log/pods
             restartPolicy: Always
