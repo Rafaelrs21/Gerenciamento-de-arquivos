@@ -29,24 +29,35 @@ spec:
                             subPath: postgres
                         -   name: postgres-log-config
                             mountPath: /docker-entrypoint-initdb.d/
-                # Sidecar rsyslog para enviar logs para Graylog
-                -   name: rsyslog
-                    image: rsyslog/syslog_appliance_alpine:latest
+                        -   name: postgres-logs
+                            mountPath: /var/log/postgresql
+                # Sidecar Filebeat para coletar logs do PostgreSQL
+                -   name: filebeat
+                    image: docker.elastic.co/beats/filebeat:8.11.0
+                    args: [
+                      "-c", "/etc/filebeat/filebeat.yml",
+                      "-e",
+                    ]
                     env:
-                        -   name: GRAYLOG_HOST
-                            value: "server.file-flow.svc.cluster.local"
-                        -   name: GRAYLOG_PORT
-                            value: "5140"
+                    - name: NODE_NAME
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: spec.nodeName
                     volumeMounts:
-                        -   name: rsyslog-config
-                            mountPath: /etc/rsyslog.d/
+                    - name: filebeat-config
+                      mountPath: /etc/filebeat
+                    - name: postgres-logs
+                      mountPath: /var/log/postgresql
+                      readOnly: true
             volumes:
                 -   name: postgres-log-config
                     configMap:
                         name: postgres-log-config
-                -   name: rsyslog-config
+                -   name: postgres-logs
+                    emptyDir: {}
+                -   name: filebeat-config
                     configMap:
-                        name: rsyslog-config
+                        name: filebeat-postgres-config
     volumeClaimTemplates:
         -   metadata:
                 name: postgres-data

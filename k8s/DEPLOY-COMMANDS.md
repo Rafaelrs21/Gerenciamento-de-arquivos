@@ -1,4 +1,4 @@
-# Deploy Commands - FileFlow with Graylog Integration
+# Deploy Commands - FileFlow with Intelligent Logging
 
 ## 🚀 Quick Start Summary
 
@@ -9,23 +9,28 @@ For experienced users, the essential commands are:
 kubectl create namespace file-flow
 
 # 2. Deploy infrastructure  
-kubectl apply -f k8s/postgres && kubectl apply -f k8s/redis && kubectl apply -f k8s/fluent-bit
+kubectl apply -f k8s/postgres && kubectl apply -f k8s/redis
 helm install graylog ./k8s/graylog/ -n file-flow
 
+# 3. Deploy intelligent logging
+kubectl apply -f k8s/fluent-bit
 
+# 4. Deploy applications
 kubectl apply -f k8s/fileflow && kubectl apply -f k8s/fileflow-front
 
+# 5. Access applications
 kubectl port-forward -n file-flow svc/fileflow-front-svc 3000:80
 # Frontend: http://localhost:3000
 # Graylog: http://localhost:30090 (admin/admin)
 ```
 
-## Prerequisites
+## Requisitos
 
 - kubectl installed and configured
 - helm installed
-- Kubernetes cluster running 
+- Kubernetes cluster running
 
+## Step-by-Step Deployment
 
 ### 1. Create Namespace
 
@@ -33,68 +38,48 @@ kubectl port-forward -n file-flow svc/fileflow-front-svc 3000:80
 kubectl create namespace file-flow
 ```
 
-### 2. Apply Configuration Files
+### 2. Apply PostgreSQL Configuration
 
 ```bash
-# PostgreSQL configuration
-kubectl apply -f ./k8s/postgres/postgres-config.yaml
+kubectl apply -f k8s/postgres/postgres-config.yaml
 ```
 
-### 3. Deploy Databases
+### 3. Deploy Infrastructure
 
 ```bash
-# PostgreSQL
+# Deploy PostgreSQL and Redis
 kubectl apply -f k8s/postgres
 kubectl apply -f k8s/redis
+
+# Deploy Graylog with Helm
 helm install graylog ./k8s/graylog/ -n file-flow
 ```
 
-### 4. Deploy Log Collector (Fluent Bit) - Basic
+### 4. Deploy Intelligent Log Collector (Fluent Bit)
 
 ```bash
-# Deploy Fluent Bit basic configuration
-kubectl apply -f k8s/fluent-bit-rbac.yaml
-kubectl apply -f k8s/fluent-bit-configmap.yaml  
-kubectl apply -f k8s/fluent-bit-daemonset.yaml
+# Deploy Fluent Bit with automatic tagging and intelligent processing
+kubectl apply -f k8s/fluent-bit
 ```
 
-### 5. Upgrade to Enhanced Fluent Bit (Recommended)
+### 5. Deploy Applications
 
 ```bash
-# Remove basic configuration
-kubectl delete configmap fluent-bit-config -n kube-system
-
-# Apply enhanced configuration with automatic tagging
-kubectl apply -f k8s/fluent-bit-enhanced-configmap.yaml
-
-# Update DaemonSet to use enhanced configuration
-kubectl patch daemonset fluent-bit -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"fluent-bit-config","configMap":{"name":"fluent-bit-config-enhanced"}}]}}}}'
-
-# Verify Fluent Bit is running with new configuration
-kubectl get pods -n kube-system | findstr fluent-bit
-kubectl logs -n kube-system daemonset/fluent-bit --tail=10
-```
-
-### 6. Deploy Applications
-
-```bash
-# FileFlow Backend
+# Deploy FileFlow Backend and Frontend
 kubectl apply -f k8s/fileflow
 kubectl apply -f k8s/fileflow-front
 ```
 
-### 7. Access Applications
+### 6. Access Applications
 
 ```bash
-# Open Frontend (in new terminal/background)
+# Open Frontend (run in background or new terminal)
 kubectl port-forward -n file-flow svc/fileflow-front-svc 3000:80
 
 # Access URLs:
 # Frontend: http://localhost:3000
 # Graylog: http://localhost:30090 (admin/admin)
 ```
-
-
 
 ## Verification Commands
 
@@ -105,8 +90,8 @@ kubectl get pods -n kube-system | findstr fluent-bit
 
 # Check services and port-forwards
 kubectl get svc -n file-flow
-netstat -an | findstr :3000   # Check if frontend port is open
-netstat -an | findstr :30090  # Check if Graylog port is open
+netstat -an | findstr :3000   # Frontend port
+netstat -an | findstr :30090  # Graylog port
 
 # Check deployments and DaemonSet
 kubectl get deployments -n file-flow
@@ -116,23 +101,16 @@ kubectl get daemonset -n kube-system fluent-bit
 kubectl logs -n file-flow deployment/graylog --tail=20
 kubectl logs -n file-flow deployment/fileflow-deployment --tail=20
 
-# Check Fluent Bit configuration and logs
-kubectl get configmap fluent-bit-config-enhanced -n kube-system
+# Check Fluent Bit status
+kubectl get configmap fluent-bit-config -n kube-system
 kubectl logs -n kube-system daemonset/fluent-bit --tail=20
-kubectl describe daemonset fluent-bit -n kube-system
 
 # Test log collection in Graylog
 # Go to: http://localhost:30090 (admin/admin)
 # Search: k8s_container_name:fileflow
 ```
 
-## Access Information
-
-- **Graylog Web UI**: http://localhost:30090
-- **Username**: admin
-- **Password**: admin
-
-## Required Graylog Configuration
+## Graylog Configuration
 
 ### 1. Configure Input (System > Inputs)
 
@@ -140,7 +118,7 @@ kubectl describe daemonset fluent-bit -n kube-system
 - Port: 12201
 - Bind address: 0.0.0.0  
 - For: All pod logs collected by Fluent Bit
-- **Note**: This single input will receive ALL logs from your cluster with rich Kubernetes metadata
+- **Note**: This single input receives ALL logs with rich Kubernetes metadata
 
 ### 2. Create Organized Streams (System > Streams)
 
@@ -188,28 +166,36 @@ Create these streams for automatic log organization:
   - `message` matches regex `(?i)(username|login|files|upload|download)`
 - ❌ **DO NOT** remove matches from "All messages" stream
 
-### 3. Test Filters
+### 3. Available Filter Fields
 
-Use these filters in Graylog search to test:
+The Fluent Bit configuration automatically adds these fields for filtering:
 
 ```bash
-# Backend Java logs
+# Component filters
+app_component:backend
+app_component:frontend
+app_component:database
+app_component:cache
+
+# Operation type filters
+operation_type:database
+operation_type:http_request
+operation_type:file_operation
+operation_type:user_action
+
+# Business action filters
+business_action:file_management
+business_action:authentication
+
+# Technical filters
+framework:hibernate
+log_level:error
+log_level:warning
+log_level:info
+
+# Kubernetes filters
 k8s_container_name:fileflow
-
-# Frontend HTTP logs  
-k8s_container_name:fileflow-front
-
-# All application logs
 k8s_namespace_name:file-flow
-
-# Only errors
-k8s_namespace_name:file-flow AND (level:error OR message:*error*)
-
-# Hibernate queries
-message:*Hibernate*
-
-# HTTP requests
-message:*HTTP*
 ```
 
 ## Troubleshooting
@@ -219,11 +205,6 @@ message:*HTTP*
 **Pods in Pending state:**
 ```bash
 kubectl describe pod <pod-name> -n file-flow
-```
-
-**Service not accessible:**
-```bash
-kubectl get endpoints -n file-flow
 ```
 
 **Frontend not accessible on localhost:3000:**
@@ -252,10 +233,10 @@ kubectl get pods -n kube-system | findstr fluent-bit
 kubectl logs -n kube-system daemonset/fluent-bit --tail=50
 
 # Verify configuration
-kubectl get configmap fluent-bit-config-enhanced -n kube-system
+kubectl get configmap fluent-bit-config -n kube-system
 ```
 
-**Logs not appearing in Graylog streams:**
+**Logs not appearing in Graylog:**
 ```bash
 # Test basic search in Graylog
 # Search: k8s_namespace_name:file-flow
@@ -265,18 +246,6 @@ kubectl get configmap fluent-bit-config-enhanced -n kube-system
 
 # Verify stream rules are correct
 # Go to: System > Streams > [Your Stream] > Manage Rules
-```
-
-**Fluent Bit configuration issues:**
-```bash
-# Reset to basic configuration
-kubectl delete configmap fluent-bit-config-enhanced -n kube-system
-kubectl apply -f k8s/fluent-bit-configmap.yaml
-kubectl patch daemonset fluent-bit -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"fluent-bit-config","configMap":{"name":"fluent-bit-config"}}]}}}}'
-
-# Re-apply enhanced configuration
-kubectl apply -f k8s/fluent-bit-enhanced-configmap.yaml
-kubectl patch daemonset fluent-bit -n kube-system -p '{"spec":{"template":{"spec":{"volumes":[{"name":"fluent-bit-config","configMap":{"name":"fluent-bit-config-enhanced"}}]}}}}'
 ```
 
 ### Cleanup (if needed)
@@ -289,17 +258,9 @@ kubectl delete namespace file-flow
 helm uninstall graylog -n file-flow
 
 # Remove Fluent Bit (optional)
-kubectl delete daemonset fluent-bit -n kube-system
-kubectl delete configmap fluent-bit-config-enhanced -n kube-system
-kubectl delete configmap fluent-bit-config -n kube-system
-kubectl delete clusterrole fluent-bit
-kubectl delete clusterrolebinding fluent-bit
-kubectl delete serviceaccount fluent-bit -n kube-system
+kubectl delete -f k8s/fluent-bit
 
 # Stop port-forwards
-# Find and kill port-forward processes
-netstat -an | findstr :3000
-netstat -an | findstr :30090
 # Press Ctrl+C in terminals running port-forward
 ```
 
@@ -313,15 +274,15 @@ netstat -an | findstr :30090
 - **Graylog**: Central log aggregation with DataNode for indexing
 - **MongoDB**: Graylog metadata storage
 
-### Logging Infrastructure
-- **Fluent Bit Enhanced**: DaemonSet running on all nodes with intelligent log processing
+### Intelligent Logging Infrastructure
+- **Fluent Bit**: DaemonSet with intelligent log processing and automatic tagging
 - **Automatic Tagging**: Logs enriched with app_component, operation_type, log_level, etc.
 - **Stream Organization**: Automatic separation by Backend, Frontend, Database, Cache, Errors, User Activity
 - **GELF UDP Input**: Single input (port 12201) receiving all logs with rich metadata
 
 ### Log Flow & Processing
 1. **Collection**: All pod logs → Fluent Bit (reads from `/var/log/containers/`)
-2. **Enhancement**: Fluent Bit adds Kubernetes metadata + custom tags
+2. **Enhancement**: Fluent Bit adds Kubernetes metadata + intelligent tags
 3. **Transport**: GELF UDP → Graylog (port 12201)
 4. **Organization**: Graylog streams automatically route logs by rules
 5. **Analysis**: Organized dashboards, searches, and alerts
@@ -338,21 +299,15 @@ netstat -an | findstr :30090
 ✅ **Real-time Monitoring**: Live log streaming and analysis  
 ✅ **Scalable Architecture**: DaemonSet scales with cluster nodes
 
-## 📁 Related Files
+## 📁 Configuration Files
 
-### Fluent Bit Configuration Files
+### Fluent Bit Directory (`k8s/fluent-bit/`)
 - `fluent-bit-rbac.yaml` - Permissions for Fluent Bit
-- `fluent-bit-configmap.yaml` - Basic Fluent Bit configuration  
-- `fluent-bit-enhanced-configmap.yaml` - **Enhanced configuration with automatic tagging**
+- `fluent-bit-configmap.yaml` - **Intelligent configuration with automatic tagging**
 - `fluent-bit-daemonset.yaml` - DaemonSet deployment
 
-### Documentation Files
-- `AUTOMATIC-SETUP-GUIDE.md` - Detailed guide for automatic log organization
-- `GRAYLOG-FILTERS-GUIDE.md` - Comprehensive filtering and search guide
-- `FLUENT-BIT-README.md` - Technical details about Fluent Bit implementation
-
-### Configuration Files
-- `graylog-streams-config.json` - Stream configurations for import (if needed)
+### Other Configuration
+- `graylog-streams-config.json` - Stream configurations for import (optional)
 
 ## 🎯 Next Steps
 
@@ -362,8 +317,6 @@ After deployment:
 2. **Configure Graylog streams** for automatic log organization
 3. **Set up dashboards** in Graylog for monitoring
 4. **Configure alerts** for proactive monitoring
-5. **Explore log filters** using the GRAYLOG-FILTERS-GUIDE.md
+5. **Explore intelligent filtering** using the available filter fields
 
-For detailed configuration and advanced features, see:
-- `AUTOMATIC-SETUP-GUIDE.md` - Complete automation guide
-- `GRAYLOG-FILTERS-GUIDE.md` - Advanced filtering techniques 
+**🚀 Result**: Complete FileFlow application with intelligent, organized logging system! 
