@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
     name: postgres
+    namespace: file-flow
 spec:
     serviceName: "postgres"
     replicas: 1
@@ -26,6 +27,26 @@ spec:
                         -   name: postgres-data
                             mountPath: /var/lib/postgresql/data
                             subPath: postgres
+                        -   name: postgres-log-config
+                            mountPath: /docker-entrypoint-initdb.d/
+                # Sidecar rsyslog para enviar logs para Graylog
+                -   name: rsyslog
+                    image: rsyslog/syslog_appliance_alpine:latest
+                    env:
+                        -   name: GRAYLOG_HOST
+                            value: "server.file-flow.svc.cluster.local"
+                        -   name: GRAYLOG_PORT
+                            value: "5140"
+                    volumeMounts:
+                        -   name: rsyslog-config
+                            mountPath: /etc/rsyslog.d/
+            volumes:
+                -   name: postgres-log-config
+                    configMap:
+                        name: postgres-log-config
+                -   name: rsyslog-config
+                    configMap:
+                        name: rsyslog-config
     volumeClaimTemplates:
         -   metadata:
                 name: postgres-data

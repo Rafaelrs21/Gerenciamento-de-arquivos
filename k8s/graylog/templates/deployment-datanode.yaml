@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graylog-datanode
+  labels:
+    app: graylog-datanode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: graylog-datanode
+  template:
+    metadata:
+      labels:
+        app: graylog-datanode
+    spec:
+      hostname: datanode
+      containers:
+        - name: graylog-datanode
+          image: "{{ .Values.datanode.image.repository }}:{{ .Values.datanode.image.tag }}"
+          env:
+            - name: GRAYLOG_DATANODE_NODE_ID_FILE
+              value: "/var/lib/graylog-datanode/node-id"
+            - name: GRAYLOG_DATANODE_PASSWORD_SECRET
+              value: "thisisaverysecretkey123"
+            - name: GRAYLOG_DATANODE_MONGODB_URI
+              value: "mongodb://mongodb:27017/graylog"
+          ports:
+            - containerPort: 8999
+              name: api
+            - containerPort: 9200
+              name: rest
+            - containerPort: 9300
+              name: transport
+          volumeMounts:
+            - name: graylog-datanode-data
+              mountPath: /var/lib/graylog-datanode
+      volumes:
+        - name: graylog-datanode-data
+          {{- if .Values.datanode.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: graylog-datanode-pvc
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
