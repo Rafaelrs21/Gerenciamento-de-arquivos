@@ -12,6 +12,12 @@ services:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: file_flow
 
+  redis:
+      image: redis:latest
+      restart: always
+      ports:
+        - '6379:6379'
+
 networks:
   development-network:
     driver: bridge
