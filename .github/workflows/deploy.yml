@@ -29,7 +29,7 @@ jobs:
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Build da imagem Docker
-              run: docker build -t rafaelreis0/fileflow:latest
+              run: docker build -t rafaelreis0/fileflow:latest .
 
             - name: Push da imagem para o Docker Hub
               run: docker push rafaelreis0/fileflow:latest
