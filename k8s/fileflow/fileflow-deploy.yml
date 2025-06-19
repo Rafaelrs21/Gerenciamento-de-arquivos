@@ -16,7 +16,7 @@ spec:
             automountServiceAccountToken: false
             containers:
                 -   name: fileflow
-                    image: taohansens/fileflow-infnet:latest
+                    image: rafaelreis0/file_flow:latest
                     imagePullPolicy: Always
                     env:
                         -   name: APP_PROFILE
@@ -28,4 +28,6 @@ spec:
                     envFrom:
                         -   configMapRef:
                                 name: postgres-config
+                        -   configMapRef:
+                                name: fileflow-config
             restartPolicy: Always
