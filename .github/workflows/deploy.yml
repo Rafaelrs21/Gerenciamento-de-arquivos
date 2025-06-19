@@ -8,6 +8,7 @@ on:
 jobs:
     build:
         runs-on: ubuntu-latest
+        environment: dev
 
         steps:
             - name: Checkout do código
@@ -29,7 +30,7 @@ jobs:
                   password: ${{ secrets.DOCKERHUB_TOKEN }}
 
             - name: Build da imagem Docker
-              run: docker build -t rafaelreis0/fileflow:latest .
+              run: docker build -t rafaelreis0/file_flow:latest .
 
             - name: Push da imagem para o Docker Hub
-              run: docker push rafaelreis0/fileflow:latest
+              run: docker push rafaelreis0/file_flow:latest

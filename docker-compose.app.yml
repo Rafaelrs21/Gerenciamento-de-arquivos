@@ -1,6 +1,6 @@
 services:
     app:
-        image: rafaelreis0/fileflow:latest
+        image: rafaelreis0/file_flow:latest
         container_name: file-flow-app-container
         networks:
             - file-flow-network
