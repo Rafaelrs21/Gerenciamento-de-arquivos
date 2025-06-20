@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-log-config
+  namespace: file-flow
+data:
+  01-logging.sql: |
+    -- Configurações de logging do PostgreSQL
+    ALTER SYSTEM SET log_destination = 'syslog';
+    ALTER SYSTEM SET syslog_facility = 'LOCAL0';
+    ALTER SYSTEM SET syslog_ident = 'postgres';
+    ALTER SYSTEM SET logging_collector = 'on';
+    ALTER SYSTEM SET log_directory = '/var/log/postgresql';
+    ALTER SYSTEM SET log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log';
+    ALTER SYSTEM SET log_rotation_age = '1d';
+    ALTER SYSTEM SET log_rotation_size = '100MB';
+    ALTER SYSTEM SET log_min_duration_statement = '1000';
+    ALTER SYSTEM SET log_checkpoints = 'on';
+    ALTER SYSTEM SET log_connections = 'on';
+    ALTER SYSTEM SET log_disconnections = 'on';
+    ALTER SYSTEM SET log_lock_waits = 'on';
+    ALTER SYSTEM SET log_statement = 'all';
+    SELECT pg_reload_conf();
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rsyslog-config
+  namespace: file-flow
+data:
+  49-postgres.conf: |
+    # Configuração rsyslog para PostgreSQL
+    $ModLoad imuxsock
+    $ModLoad imklog
+    
+    # Enviar logs LOCAL0 (PostgreSQL) para Graylog
+    LOCAL0.*    @@server.file-flow.svc.cluster.local:5140
+    
+    # Log local para debug
+    LOCAL0.*    /var/log/postgresql.log
+    
+    # Não processar outras mensagens localmente
+    & stop 

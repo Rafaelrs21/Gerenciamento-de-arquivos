@@ -1,0 +1,29 @@
+{{- if .Values.datanode.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graylog-datanode-pvc
+  labels:
+    app: graylog-datanode
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.datanode.persistence.size }}
+---
+{{- end }}
+{{- if .Values.graylog.persistence.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graylog-data-pvc
+  labels:
+    app: graylog
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.graylog.persistence.size }}
+{{- end }} 
