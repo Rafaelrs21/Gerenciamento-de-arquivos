@@ -11,11 +11,11 @@ public class ConnectionTest extends BaseSeleniumTest {
         boolean servicesRunning = areServicesRunning();
         
         if (servicesRunning) {
-            System.out.println("✅ Todos os serviços estão rodando!");
+            System.out.println("  Todos os serviços estão rodando!");
             System.out.println("   - Backend: " + BACKEND_URL);
             System.out.println("   - Frontend: " + FRONTEND_URL);
         } else {
-            System.out.println("❌ Alguns serviços não estão rodando:");
+            System.out.println("  Alguns serviços não estão rodando:");
             System.out.println("   - Verifique se o backend está rodando na porta 8080");
             System.out.println("   - Verifique se o frontend está rodando na porta 5173");
         }
@@ -31,7 +31,7 @@ public class ConnectionTest extends BaseSeleniumTest {
         String title = driver.getTitle();
         assertNotNull(title, "Título da página não deve ser nulo");
         
-        System.out.println("✅ Frontend acessível. Título da página: " + title);
+        System.out.println("Frontend acessível. Título da página: " + title);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class ConnectionTest extends BaseSeleniumTest {
         assertTrue(pageSource.contains("UP") || pageSource.contains("status"), 
                   "Endpoint de health deve retornar status");
         
-        System.out.println("✅ Backend health check funcionando");
+        System.out.println("Backend health check funcionando");
     }
 
     static boolean servicesNotRunning() {

@@ -24,7 +24,6 @@ spec:
                     env:
                     - name: BACKEND_URL
                       value: "http://fileflow-svc:8080"
-                    # Configurações Graylog para logs do frontend
                     - name: GRAYLOG_HOST
                       value: "server.file-flow.svc.cluster.local"
                     - name: GRAYLOG_PORT
@@ -32,7 +31,6 @@ spec:
                     volumeMounts:
                     - name: nginx-logs
                       mountPath: /var/log/nginx
-                # Sidecar Filebeat para coletar logs do Nginx
                 -   name: filebeat
                     image: docker.elastic.co/beats/filebeat:8.11.0
                     args: [

@@ -6,17 +6,19 @@ metadata:
 data:
   filebeat.yml: |
     filebeat.inputs:
-    - type: container
+    - type: log
       enabled: true
       paths:
-        - /var/log/containers/fileflow-*.log
+        - /var/log/app/*.log
       fields:
         component: java
         service: fileflow-backend
       fields_under_root: true
-      json.keys_under_root: true
-      json.add_error_key: true
-      json.message_key: log
+      multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+      multiline.negate: true
+      multiline.match: after
+      scan_frequency: 10s
+      close_inactive: 5m
 
     output.logstash:
       hosts: ["server.file-flow.svc.cluster.local:5044"]
@@ -28,16 +30,7 @@ data:
         host: "${NODE_NAME}"
         matchers:
         - logs_path:
-            logs_path: "/var/log/containers/"
-    - decode_json_fields:
-        fields: ["message"]
-        target: ""
-        overwrite_keys: true
+            logs_path: "/var/log/app/"
 
-    logging.level: debug
-    logging.to_files: true
-    logging.files:
-      path: /var/log/filebeat
-      name: filebeat
-      keepfiles: 7
-      permissions: 0644 
+    logging.level: error
+    logging.to_files: false 

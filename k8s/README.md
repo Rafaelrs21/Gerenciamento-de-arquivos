@@ -55,11 +55,14 @@ Após a conclusão(aprox 3min), quando ficar verde clicar em Resume.. sera redir
 
 logar com admin/admin
 
+Ir em System -> Content Packs e instalar o pack graylog-streams-config
 
+Com isso vai estar configurado para receber logs do fileflow.
 
+Unico porem que não vai categorizar os logs, vai ser apenas um log.
+Precisa ir em System -> Inputs e obter o Id destes inputs(codigo varia sempre), atraves do show received messages.
+Usar este gl2_source_input:68554048908334446a4cda76 para configurar os filtros no Streams.
 
-
-choco install openssl
 
 
 

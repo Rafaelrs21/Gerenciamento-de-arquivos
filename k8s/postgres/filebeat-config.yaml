@@ -14,9 +14,11 @@ data:
         component: postgresql
         service: postgres-db
       fields_under_root: true
-      multiline.pattern: '^\d{4}-\d{2}-\d{2}'
+      multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
       multiline.negate: true
       multiline.match: after
+      scan_frequency: 10s
+      close_inactive: 5m
 
     output.logstash:
       hosts: ["server.file-flow.svc.cluster.local:5044"]
@@ -30,10 +32,5 @@ data:
         - logs_path:
             logs_path: "/var/log/postgresql/"
 
-    logging.level: info
-    logging.to_files: true
-    logging.files:
-      path: /var/log/filebeat
-      name: filebeat
-      keepfiles: 7
-      permissions: 0644 
+    logging.level: error
+    logging.to_files: false 

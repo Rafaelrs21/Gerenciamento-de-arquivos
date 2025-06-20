@@ -33,10 +33,5 @@ data:
     - drop_fields:
         fields: ["agent", "ecs", "host.architecture", "host.os"]
 
-    logging.level: info
-    logging.to_files: true
-    logging.files:
-      path: /var/log/filebeat
-      name: filebeat
-      keepfiles: 7
-      permissions: 0644 
+    logging.level: error
+    logging.to_files: false 
