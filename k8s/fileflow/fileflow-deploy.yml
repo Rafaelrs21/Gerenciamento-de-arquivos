@@ -21,13 +21,6 @@ spec:
               volumeMounts:
               - name: app-logs
                 mountPath: /var/log/app
-            initContainers:
-            - name: setup-logs
-              image: busybox:1.35
-              command: ['sh', '-c', 'mkdir -p /var/log/app && chmod 755 /var/log/app']
-              volumeMounts:
-              - name: app-logs
-                mountPath: /var/log/app
             containers:
                 -   name: fileflow
                     image: rafaelreis0/file_flow:latest
