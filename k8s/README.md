@@ -7,6 +7,8 @@ kubectl create ns file-flow
 kubectl config set-context --current --namespace=file-flow
 ```
 
+### Criar secrets
+
 ### Criar
 ```bash
 kubectl apply -f k8s/postgres
@@ -55,7 +57,7 @@ Após a conclusão(aprox 3min), quando ficar verde clicar em Resume.. sera redir
 
 logar com admin/admin
 
-Ir em System -> Content Packs e instalar o pack graylog-streams-config
+Ir em System -> Content Packs e instalar o pack content-pack-fe76a969-79b0-4b96-8d68-010233862bab-1.json
 
 Com isso vai estar configurado para receber logs do fileflow.
 
