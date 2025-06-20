@@ -14,32 +14,26 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
-    # GELF UDP para aplicações
     - port: 12201
       targetPort: 12201
       protocol: UDP
       name: gelf-udp
-    # GELF TCP para aplicações
     - port: 12201
       targetPort: 12201
       protocol: TCP
       name: gelf-tcp
-    # Beats input para Filebeat
     - port: 5044
       targetPort: 5044
       protocol: TCP
       name: beats
-    # Syslog TCP para PostgreSQL
     - port: 5140
       targetPort: 5140
       protocol: TCP
       name: syslog-tcp
-    # Syslog UDP para sistemas diversos
     - port: 5140
       targetPort: 5140
       protocol: UDP
       name: syslog-udp
-    # Raw TCP para dados customizados
     - port: 5555
       targetPort: 5555
       protocol: TCP

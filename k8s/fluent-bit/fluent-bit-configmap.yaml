@@ -6,7 +6,6 @@ metadata:
   labels:
     k8s-app: fluent-bit
 data:
-  # Enhanced configuration with better tagging and organization
   fluent-bit.conf: |
     [SERVICE]
         Flush         1

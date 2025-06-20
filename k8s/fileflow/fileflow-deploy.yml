@@ -14,6 +14,13 @@ spec:
                 app: fileflow
         spec:
             automountServiceAccountToken: false
+            initContainers:
+            - name: setup-logs
+              image: busybox:1.35
+              command: ['sh', '-c', 'mkdir -p /var/log/app && chmod 755 /var/log/app']
+              volumeMounts:
+              - name: app-logs
+                mountPath: /var/log/app
             containers:
                 -   name: fileflow
                     image: taohansens/fileflow-infnet:latest
@@ -27,22 +34,23 @@ spec:
                             value: "redis-svc"
                         -   name: SERVER_PORT
                             value: "8080"
-                        # Configurações Graylog
-                        -   name: GRAYLOG_HOST
-                            value: "server.file-flow.svc.cluster.local"
-                        -   name: GRAYLOG_PORT
-                            value: "12201"
-                        -   name: LOGGING_GELF_ENABLED
-                            value: "true"
-                        -   name: LOGGING_LEVEL_COM_YOURAPP
-                            value: "INFO"
+                        -   name: LOGGING_FILE_NAME
+                            value: "/var/log/app/fileflow.log"
+                        -   name: LOGGING_PATTERN_FILE
+                            value: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+                        -   name: LOGGING_LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE
+                            value: "10MB"
+                        -   name: LOGGING_LOGBACK_ROLLINGPOLICY_MAX_HISTORY
+                            value: "10"
                     envFrom:
                         -   configMapRef:
                                 name: postgres-config
                     ports:
                         -   containerPort: 8080
                             name: http
-                # Sidecar Filebeat para coletar logs da aplicação
+                    volumeMounts:
+                        -   name: app-logs
+                            mountPath: /var/log/app
                 -   name: filebeat
                     image: docker.elastic.co/beats/filebeat:8.11.0
                     args: [
@@ -54,23 +62,19 @@ spec:
                       valueFrom:
                         fieldRef:
                           fieldPath: spec.nodeName
+                    securityContext:
+                      runAsUser: 0
+                      privileged: true
                     volumeMounts:
                     - name: filebeat-config
                       mountPath: /etc/filebeat
-                    - name: varlogcontainers
-                      mountPath: /var/log/containers
-                      readOnly: true
-                    - name: varlogpods
-                      mountPath: /var/log/pods
+                    - name: app-logs
+                      mountPath: /var/log/app
                       readOnly: true
             volumes:
             - name: filebeat-config
               configMap:
                 name: filebeat-backend-config
-            - name: varlogcontainers
-              hostPath:
-                path: /var/log/containers
-            - name: varlogpods
-              hostPath:
-                path: /var/log/pods
+            - name: app-logs
+              emptyDir: {}
             restartPolicy: Always

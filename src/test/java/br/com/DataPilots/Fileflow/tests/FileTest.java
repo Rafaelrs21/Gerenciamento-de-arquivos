@@ -19,24 +19,21 @@ public class FileTest extends BaseSeleniumTest {
         
         System.out.println("Iniciando teste completo: Registrar → Login → Upload → Excluir");
         
-        // 1. REGISTRAR USUÁRIO
         System.out.println("1. Registrando usuário...");
         driver.get(FRONTEND_URL + "/login");
         Thread.sleep(3000);
         
-        // Clica no link de registro
         WebElement linkRegistro = wait.until(ExpectedConditions.elementToBeClickable(
             By.xpath("/html/body/div[1]/div/div[2]/div/form/div[4]/p/a")));
         linkRegistro.click();
         
-        // Aguarda página de registro
         wait.until(ExpectedConditions.urlContains("/register"));
         
-        // Dados do usuário
+
         String email = "teste" + System.currentTimeMillis() + "@fileflow.com";
         String senha = "123456";
         
-        // Preenche formulário de registro
+
         WebElement emailInput = wait.until(ExpectedConditions.presenceOfElementLocated(
             By.xpath("/html/body/div[1]/div/div[2]/div/form/div[1]/input")));
         emailInput.clear();
@@ -52,24 +49,24 @@ public class FileTest extends BaseSeleniumTest {
         confirmSenhaInput.clear();
         confirmSenhaInput.sendKeys(senha);
         
-        // Clica em registrar
+
         WebElement botaoRegistrar = driver.findElement(
             By.xpath("/html/body/div[1]/div/div[2]/div/form/div[4]/button"));
         botaoRegistrar.click();
         
-        // Aceita alerta de registro
+
         Alert alertRegistro = wait.until(ExpectedConditions.alertIsPresent());
         System.out.println("Alerta de registro: " + alertRegistro.getText());
         alertRegistro.accept();
         
         System.out.println("Usuário registrado: " + email);
         
-        // 2. FAZER LOGIN
+
         System.out.println("2. Fazendo login...");
         driver.get(FRONTEND_URL + "/login");
         Thread.sleep(3000);
         
-        // Preenche formulário de login
+
         WebElement emailLoginInput = wait.until(ExpectedConditions.presenceOfElementLocated(
             By.xpath("/html/body/div[1]/div/div[2]/div/form/div[1]/input")));
         emailLoginInput.clear();
@@ -89,18 +86,18 @@ public class FileTest extends BaseSeleniumTest {
         
         System.out.println("3. Enviando arquivo...");
         
-        // Cria arquivo temporário
+
         java.io.File arquivoTeste = java.io.File.createTempFile("teste_completo", ".txt");
         java.nio.file.Files.write(arquivoTeste.toPath(), "Arquivo para teste completo".getBytes());
         
-        // Encontra input de arquivo e envia
+
         WebElement inputArquivo = wait.until(ExpectedConditions.presenceOfElementLocated(
             By.xpath("//input[@type='file']")));
         inputArquivo.sendKeys(arquivoTeste.getAbsolutePath());
         
         System.out.println("Arquivo enviado: " + arquivoTeste.getName());
         
-        // Aceita alerta de upload se aparecer
+
         try {
             Alert alertUpload = wait.until(ExpectedConditions.alertIsPresent());
             System.out.println("Alerta de upload: " + alertUpload.getText());
@@ -111,7 +108,7 @@ public class FileTest extends BaseSeleniumTest {
         
         Thread.sleep(5000);
         
-        System.out.println("🗑️ 4. Excluindo arquivo...");
+        System.out.println("4. Excluindo arquivo...");
         
         WebElement botaoExcluir = null;
         
@@ -143,7 +140,7 @@ public class FileTest extends BaseSeleniumTest {
         
         Alert alertExclusao = wait.until(ExpectedConditions.alertIsPresent());
         System.out.println("Alerta de exclusão: " + alertExclusao.getText());
-        alertExclusao.accept(); // Confirma exclusão
+        alertExclusao.accept();
         
         System.out.println("Arquivo excluído com sucesso!");
         

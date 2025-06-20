@@ -18,16 +18,12 @@ public abstract class BaseSeleniumTest {
     protected static String FRONTEND_URL = "http://localhost:5173";
     protected static String BACKEND_URL = "http://localhost:8080";
 
-    /**
-     * Verifica se uma porta está disponível/aberta
-     */
+
     private static boolean isPortOpen(String host, int port) {
-        // Tenta IPv4 primeiro
         try (Socket socket = new Socket()) {
-            socket.connect(new java.net.InetSocketAddress(host, port), 3000); // timeout de 3 segundos
+            socket.connect(new java.net.InetSocketAddress(host, port), 3000);
             return true;
         } catch (IOException e) {
-            // Se IPv4 falhar, tenta IPv6 (especialmente para Vite/Node.js)
             try (Socket socket = new Socket()) {
                 socket.connect(new java.net.InetSocketAddress("::1", port), 3000);
                 return true;
@@ -37,9 +33,6 @@ public abstract class BaseSeleniumTest {
         }
     }
 
-    /**
-     * Verifica se tanto o backend (8080) quanto o frontend (5173) estão rodando
-     */
     public static boolean areServicesRunning() {
         boolean backendRunning = isPortOpen("localhost", 8080);
         boolean frontendRunning = isPortOpen("localhost", 5173);
@@ -52,7 +45,6 @@ public abstract class BaseSeleniumTest {
 
     @BeforeAll
     public static void setUp() {
-        // Verifica se os serviços estão rodando antes de configurar o WebDriver
         if (!areServicesRunning()) {
             System.out.println("Serviços não estão rodando. Testes serão pulados.");
             System.out.println("   Para executar os testes:");
@@ -63,7 +55,6 @@ public abstract class BaseSeleniumTest {
 
         System.out.println("Serviços detectados. Configurando WebDriver...");
         
-        // Configura o WebDriverManager para Chrome
         WebDriverManager.chromedriver().setup();
         
         ChromeOptions options = new ChromeOptions();
