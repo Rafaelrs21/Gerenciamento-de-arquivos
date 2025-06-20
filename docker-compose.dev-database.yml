@@ -5,7 +5,7 @@ services:
     container_name: file-flow-database-container
     restart: always
     networks:
-      - development-network
+      - file-flow-network
     ports:
       - "5432:5432"
     environment:
@@ -15,9 +15,11 @@ services:
   redis:
       image: redis:latest
       restart: always
+      networks:
+          - file-flow-network
       ports:
         - '6379:6379'
 
 networks:
-  development-network:
-    driver: bridge
+    file-flow-network:
+        external: true
