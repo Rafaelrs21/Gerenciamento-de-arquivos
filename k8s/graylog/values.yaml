@@ -1,0 +1,31 @@
+replicaCount: 1
+
+image:
+  repository: graylog/graylog
+  tag: "6.1"
+  pullPolicy: IfNotPresent
+
+datanode:
+  image:
+    repository: graylog/graylog-datanode
+    tag: "6.1"
+  persistence:
+    enabled: true
+    size: 1Gi
+
+mongodb:
+  image:
+    repository: mongo
+    tag: "6.0"
+  persistence:
+    enabled: true
+    size: 1Gi
+
+graylog:
+  persistence:
+    enabled: true
+    size: 1Gi
+
+service:
+  type: NodePort
+  nodePort: 30090

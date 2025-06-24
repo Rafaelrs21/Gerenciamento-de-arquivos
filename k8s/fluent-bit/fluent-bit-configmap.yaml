@@ -1,0 +1,199 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-bit-config
+  namespace: kube-system
+  labels:
+    k8s-app: fluent-bit
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Flush         1
+        Log_Level     info
+        Daemon        off
+        Parsers_File  parsers.conf
+        HTTP_Server   On
+        HTTP_Listen   0.0.0.0
+        HTTP_Port     2020
+
+    @INCLUDE input-kubernetes.conf
+    @INCLUDE filter-kubernetes.conf
+    @INCLUDE filter-enhancement.conf
+    @INCLUDE output-graylog.conf
+
+  input-kubernetes.conf: |
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        Parser            docker
+        DB                /var/log/flb_kube.db
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+  filter-kubernetes.conf: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc:443
+        Kube_CA_File        /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        Kube_Token_File     /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_Tag_Prefix     kube.var.log.containers.
+        Merge_Log           On
+        Merge_Log_Key       log_processed
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+        Annotations         On
+        Labels              On
+
+    [FILTER]
+        Name                nest
+        Match               kube.*
+        Operation           lift
+        Nested_under        kubernetes
+        Add_prefix          k8s_
+
+  filter-enhancement.conf: |
+    # Add application-specific tags
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Add                 source fluent-bit
+        Add                 facility k8s-logs
+        Add                 environment production
+
+    # Tag FileFlow Backend
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches k8s_container_name fileflow
+        Add                 app_component backend
+        Add                 app_type java-spring
+        Add                 log_category application
+
+    # Tag FileFlow Frontend  
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches k8s_container_name fileflow-front
+        Add                 app_component frontend
+        Add                 app_type nginx
+        Add                 log_category web-server
+
+    # Tag PostgreSQL
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches k8s_container_name postgres
+        Add                 app_component database
+        Add                 app_type postgresql
+        Add                 log_category database
+
+    # Tag Redis
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches k8s_container_name redis
+        Add                 app_component cache
+        Add                 app_type redis
+        Add                 log_category cache
+
+    # Tag FileFlow namespace
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches k8s_namespace_name file-flow
+        Add                 application fileflow
+        Add                 project gerenciamento-arquivos
+
+    # Detect log levels
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *ERROR*
+        Add                 log_level error
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *WARN*
+        Add                 log_level warning
+
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *INFO*
+        Add                 log_level info
+
+    # Detect Hibernate operations
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *Hibernate*
+        Add                 operation_type database
+        Add                 framework hibernate
+
+    # Detect HTTP requests
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *HTTP*
+        Add                 operation_type http_request
+        Add                 protocol http
+
+    # Detect file operations
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *files*
+        Add                 operation_type file_operation
+        Add                 business_action file_management
+
+    # Detect user operations
+    [FILTER]
+        Name                modify
+        Match               kube.*
+        Condition           Key_value_matches message *username*
+        Add                 operation_type user_action
+        Add                 business_action authentication
+
+  output-graylog.conf: |
+    [OUTPUT]
+        Name                gelf
+        Match               kube.*
+        Host                server.file-flow.svc.cluster.local
+        Port                12201
+        Mode                udp
+        Gelf_Short_Message_Key log
+        Gelf_Timestamp_Key @timestamp
+        Gelf_Host_Key      k8s_host
+        Gelf_Full_Message_Key log
+
+  parsers.conf: |
+    [PARSER]
+        Name        docker
+        Format      json
+        Time_Key    time
+        Time_Format %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep   On
+
+    [PARSER]
+        Name        syslog
+        Format      regex
+        Regex       ^\<(?<pri>[0-9]+)\>(?<time>[^ ]* {1,2}[^ ]* [^ ]*) (?<host>[^ ]*) (?<ident>[a-zA-Z0-9_\/\.\-]*)(?:\[(?<pid>[0-9]+)\])?(?:[^\:]*\:)? *(?<message>.*)$
+        Time_Key    time
+        Time_Format %b %d %H:%M:%S
+
+    [PARSER]
+        Name   nginx
+        Format regex
+        Regex ^(?<remote>[^ ]*) (?<host>[^ ]*) (?<user>[^ ]*) \[(?<time>[^\]]*)\] "(?<method>\S+)(?: +(?<path>[^\"]*?)(?: +\S*)?)?" (?<code>[^ ]*) (?<size>[^ ]*)(?: "(?<referer>[^\"]*)" "(?<agent>[^\"]*)")
+        Time_Key time
+        Time_Format %d/%b/%Y:%H:%M:%S %z
+
+    [PARSER]
+        Name        json
+        Format      json
+        Time_Key    time
+        Time_Format %d/%b/%Y:%H:%M:%S %z 
