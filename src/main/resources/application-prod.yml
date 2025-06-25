@@ -1,0 +1,33 @@
+environment: "production"
+spring:
+    config:
+        activate:
+            on-profile: production
+    application:
+        name: "Fileflow"
+        security:
+            token:
+                secret: ${FILE_FLOW_JWT_SECRET:12345678}
+    cache:
+        type: redis
+    data:
+        redis:
+            host: ${REDIS_HOST:localhost}
+            port: ${REDIS_PORT:6379}
+    datasource:
+        url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:file_flow}
+        username: ${POSTGRES_USER:postgres}
+        password: ${POSTGRES_PASSWORD:admin}
+    jpa:
+        properties:
+            hibernate:
+                show_sql: true
+                format_sql: true
+                ddl-auto: none
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+integrations:
+    ses:
+        aws_region: "us-east-1"
+        sender_email: ${SENDER_EMAIL}
+        access_key: ${AWS_ACCESS_KEY_ID:""}
+        secret_key: ${AWS_SECRET_ACCESS_KEY:""}

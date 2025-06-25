@@ -7,4 +7,4 @@ data:
     AWS_SECRET_ACCESS_KEY: ""
     FILE_FLOW_JWT_SECRET: ""
     SENDER_EMAIL: ""
-    APP_PROFILE: "k8s"
+    APP_PROFILE: "production"
