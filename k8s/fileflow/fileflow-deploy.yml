@@ -27,7 +27,7 @@ spec:
                     imagePullPolicy: Always
                     env:
                         -   name: APP_PROFILE
-                            value: "k8s"
+                            value: "production"
                         -   name: DB_HOST
                             value: "postgres-svc"
                         -   name: REDIS_HOST
