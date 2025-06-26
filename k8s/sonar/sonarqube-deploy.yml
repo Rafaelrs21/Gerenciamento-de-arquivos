@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: sonarqube
+    namespace: file-flow
+    labels:
+        app: sonarqube
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: sonarqube
+    template:
+        metadata:
+            labels:
+                app: sonarqube
+        spec:
+            containers:
+                - name: sonarqube
+                  image: sonarqube:latest
+                  ports:
+                      - containerPort: 9000
+                  env:
+                      - name: SONAR_ES_BOOTSTRAP_CHECKS_DISABLE
+                        value: "true"
+                  resources:
+                      requests:
+                          memory: "2Gi"
+                          cpu: "1000m"
+                      limits:
+                          memory: "4Gi"
+                          cpu: "2000m"
