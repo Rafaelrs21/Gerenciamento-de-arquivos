@@ -33,7 +33,7 @@ public class SecurityConfigurations {
             }).cors(cors -> {
                 cors.configurationSource(request -> {
                     var corsConfig = new org.springframework.web.cors.CorsConfiguration();
-                    corsConfig.addAllowedOrigin("http://localhost:5173");
+                    corsConfig.addAllowedOriginPattern("http://localhost:*");
                     corsConfig.addAllowedMethod("*");
                     corsConfig.addAllowedHeader("*");
                     corsConfig.setAllowCredentials(true);
@@ -44,6 +44,7 @@ public class SecurityConfigurations {
                 request.requestMatchers(HttpMethod.POST, "/login").permitAll();
                 request.requestMatchers(HttpMethod.POST, "/user").permitAll();
                 request.requestMatchers("/password_recovery").permitAll();
+                request.requestMatchers("/health").permitAll();
                 if (env.acceptsProfiles(Profiles.of("test"))) {
                     request.requestMatchers("/h2-console/**").permitAll();
                 }

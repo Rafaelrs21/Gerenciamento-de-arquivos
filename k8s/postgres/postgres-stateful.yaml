@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: postgres
+    namespace: file-flow
+spec:
+    serviceName: "postgres"
+    replicas: 1
+    selector:
+        matchLabels:
+            app: postgres
+    template:
+        metadata:
+            labels:
+                app: postgres
+        spec:
+            containers:
+                -   name: postgres
+                    image: postgres:latest
+                    ports:
+                        -   containerPort: 5432
+                            name: postgres
+                    envFrom:
+                        -   configMapRef:
+                                name: postgres-config
+                    volumeMounts:
+                        -   name: postgres-data
+                            mountPath: /var/lib/postgresql/data
+                            subPath: postgres
+                        -   name: postgres-log-config
+                            mountPath: /docker-entrypoint-initdb.d/
+                        -   name: postgres-logs
+                            mountPath: /var/log/postgresql
+                # Sidecar Filebeat para coletar logs do PostgreSQL
+                -   name: filebeat
+                    image: docker.elastic.co/beats/filebeat:8.11.0
+                    args: [
+                      "-c", "/etc/filebeat/filebeat.yml",
+                      "-e",
+                    ]
+                    env:
+                    - name: NODE_NAME
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: spec.nodeName
+                    volumeMounts:
+                    - name: filebeat-config
+                      mountPath: /etc/filebeat
+                    - name: postgres-logs
+                      mountPath: /var/log/postgresql
+                      readOnly: true
+            volumes:
+                -   name: postgres-log-config
+                    configMap:
+                        name: postgres-log-config
+                -   name: postgres-logs
+                    emptyDir: {}
+                -   name: filebeat-config
+                    configMap:
+                        name: filebeat-postgres-config
+    volumeClaimTemplates:
+        -   metadata:
+                name: postgres-data
+            spec:
+                accessModes: [ "ReadWriteOnce" ]
+                resources:
+                    requests:
+                        storage: 10Gi

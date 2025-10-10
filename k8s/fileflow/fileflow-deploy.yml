@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: fileflow-deployment
+    namespace: file-flow
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: fileflow
+    template:
+        metadata:
+            labels:
+                app: fileflow
+        spec:
+            automountServiceAccountToken: false
+            initContainers:
+            - name: setup-logs
+              image: busybox:1.35
+              command: ['sh', '-c', 'mkdir -p /var/log/app && chmod 755 /var/log/app']
+              volumeMounts:
+              - name: app-logs
+                mountPath: /var/log/app
+            containers:
+                -   name: fileflow
+                    image: rafaelreis0/file_flow:latest
+                    imagePullPolicy: Always
+                    env:
+                        -   name: APP_PROFILE
+                            value: "production"
+                        -   name: DB_HOST
+                            value: "postgres-svc"
+                        -   name: REDIS_HOST
+                            value: "redis-svc"
+                        -   name: SERVER_PORT
+                            value: "8080"
+                        -   name: LOGGING_FILE_NAME
+                            value: "/var/log/app/fileflow.log"
+                        -   name: LOGGING_PATTERN_FILE
+                            value: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+                        -   name: LOGGING_LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE
+                            value: "10MB"
+                        -   name: LOGGING_LOGBACK_ROLLINGPOLICY_MAX_HISTORY
+                            value: "10"
+                        -   name: SERVER_PORT
+                            value: "8080"
+                        -   name: LOGGING_FILE_NAME
+                            value: "/var/log/app/fileflow.log"
+                        -   name: LOGGING_PATTERN_FILE
+                            value: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+                        -   name: LOGGING_LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE
+                            value: "10MB"
+                        -   name: LOGGING_LOGBACK_ROLLINGPOLICY_MAX_HISTORY
+                            value: "10"
+                    envFrom:
+                        -   configMapRef:
+                                name: postgres-config
+                        -   configMapRef:
+                                name: fileflow-config
+                    ports:
+                        -   containerPort: 8080
+                            name: http
+                    volumeMounts:
+                        -   name: app-logs
+                            mountPath: /var/log/app
+                -   name: filebeat
+                    image: docker.elastic.co/beats/filebeat:8.11.0
+                    args: [
+                      "-c", "/etc/filebeat/filebeat.yml",
+                      "-e",
+                    ]
+                    env:
+                    - name: NODE_NAME
+                      valueFrom:
+                        fieldRef:
+                          fieldPath: spec.nodeName
+                    securityContext:
+                      runAsUser: 0
+                      privileged: true
+                    volumeMounts:
+                    - name: filebeat-config
+                      mountPath: /etc/filebeat
+                    - name: app-logs
+                      mountPath: /var/log/app
+                      readOnly: true
+            volumes:
+            - name: filebeat-config
+              configMap:
+                name: filebeat-backend-config
+            - name: app-logs
+              emptyDir: {}
+            restartPolicy: Always

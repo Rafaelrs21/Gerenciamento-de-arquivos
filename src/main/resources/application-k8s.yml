@@ -1,24 +1,23 @@
-environment: "development"
+environment: "k8s"
 spring:
-    cache:
-        type: redis
-    data:
-        redis:
-            host: localhost
-            port: 6379
-
     config:
         activate:
-            on-profile: dev
+            on-profile: k8s
     application:
         name: "Fileflow"
         security:
             token:
                 secret: ${FILE_FLOW_JWT_SECRET:12345678}
+    cache:
+        type: redis
+    data:
+        redis:
+            host: ${REDIS_HOST:localhost}
+            port: ${REDIS_PORT:6379}
     datasource:
-        url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:file_flow}
-        username: ${DB_USER:postgres}
-        password: ${DB_PASS:admin}
+        url: jdbc:postgresql://${DB_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:file_flow}
+        username: ${POSTGRES_USER:postgres}
+        password: ${POSTGRES_PASSWORD:admin}
     jpa:
         properties:
             hibernate:

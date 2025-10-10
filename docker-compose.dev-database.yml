@@ -5,13 +5,21 @@ services:
     container_name: file-flow-database-container
     restart: always
     networks:
-      - development-network
+      - file-flow-network
     ports:
       - "5432:5432"
     environment:
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: file_flow
 
+  redis:
+      image: redis:latest
+      restart: always
+      networks:
+          - file-flow-network
+      ports:
+        - '6379:6379'
+
 networks:
-  development-network:
-    driver: bridge
+    file-flow-network:
+        external: true

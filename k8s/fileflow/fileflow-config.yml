@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: fileflow-config
+data:
+    AWS_ACCESS_KEY_ID: ""
+    AWS_SECRET_ACCESS_KEY: ""
+    FILE_FLOW_JWT_SECRET: ""
+    SENDER_EMAIL: ""
+    APP_PROFILE: "production"

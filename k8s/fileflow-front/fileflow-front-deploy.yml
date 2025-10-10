@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: fileflow-front-deployment
+    namespace: file-flow
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: fileflow-front
+    template:
+        metadata:
+            labels:
+                app: fileflow-front
+        spec:
+            automountServiceAccountToken: false
+            containers:
+                -   name: fileflow-front
+                    image: taohansens/fileflow-front-infnet:latest
+                    ports:
+                    - containerPort: 80
+                      name: http
+                    imagePullPolicy: Always
+                    env:
+                    - name: BACKEND_URL
+                      value: "http://fileflow-svc:8080"
+                    - name: GRAYLOG_HOST
+                      value: "server.file-flow.svc.cluster.local"
+                    - name: GRAYLOG_PORT
+                      value: "12201"
+                    volumeMounts:
+                    - name: nginx-logs
+                      mountPath: /var/log/nginx
+                -   name: filebeat
+                    image: docker.elastic.co/beats/filebeat:8.11.0
+                    args: [
+                      "-c", "/etc/filebeat/filebeat.yml",
+                      "-e",
+                    ]
+                    env:
+                    - name: GRAYLOG_HOST
+                      value: "server.file-flow.svc.cluster.local"
+                    volumeMounts:
+                    - name: filebeat-config
+                      mountPath: /etc/filebeat
+                    - name: nginx-logs
+                      mountPath: /var/log/nginx
+                      readOnly: true
+            volumes:
+            - name: nginx-logs
+              emptyDir: {}
+            - name: filebeat-config
+              configMap:
+                name: filebeat-config
+            restartPolicy: Always

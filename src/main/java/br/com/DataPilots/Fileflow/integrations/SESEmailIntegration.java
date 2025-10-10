@@ -25,7 +25,7 @@ public class SESEmailIntegration implements EmailIntegrationInterface {
     public SESEmailIntegration(Environment env) {
         enviroment = env.getProperty("environment");
         String configGroup = "integrations.ses.";
-        awsRegion = Region.of(Objects.requireNonNull(env.getProperty(configGroup + "aws_region")));
+        awsRegion = Region.of("us-east-1");
         senderEmail = env.getProperty(configGroup + "sender_email");
         access_key = env.getProperty(configGroup + "access_key");
         secret_key = env.getProperty(configGroup + "secret_key");
